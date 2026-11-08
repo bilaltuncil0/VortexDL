@@ -1,4 +1,4 @@
-# Runtime dependencies — pinned to tested versions (Python 3.12, Zorin OS)
+# VideoDownloader v2.0.0 Runtime Dependencies
 customtkinter==6.0.0
 yt-dlp==2026.10.26
 darkdetect==0.8.0

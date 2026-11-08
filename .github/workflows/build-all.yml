@@ -1,0 +1,147 @@
+name: Cross-Platform Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            artifact_name: VideoDownloader-linux-x86_64.AppImage
+            binary_name: VideoDownloader
+            asset_name: VideoDownloader-Linux-x86_64
+          - os: windows-latest
+            artifact_name: VideoDownloader.exe
+            binary_name: VideoDownloader.exe
+            asset_name: VideoDownloader-Windows-x64.exe
+          - os: macos-13
+            artifact_name: VideoDownloader.dmg
+            binary_name: VideoDownloader
+            asset_name: VideoDownloader-macOS-x64.dmg
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install System Dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt update
+          sudo apt install -y ffmpeg aria2 gettext python3-tk
+
+      - name: Install System Dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install ffmpeg aria2 gettext create-dmg || true
+
+      - name: Install System Dependencies (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          choco install ffmpeg aria2 || true
+
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+
+      - name: Compile Translations
+        run: |
+          python -c "
+          import subprocess, os
+          for lang in ['tr_TR', 'en_US']:
+              po = os.path.join('locales', lang, 'LC_MESSAGES', 'videodownloader.po')
+              mo = os.path.join('locales', lang, 'LC_MESSAGES', 'videodownloader.mo')
+              if os.path.exists(po):
+                  subprocess.run(['msgfmt', po, '-o', mo], check=False)
+          " || true
+
+      - name: Build with PyInstaller (Linux / macOS)
+        if: runner.os != 'Windows'
+        run: |
+          pyinstaller --noconfirm --clean \
+            --onefile --windowed \
+            --name "VideoDownloader" \
+            --add-data "locales:locales" \
+            --add-data "icon.png:." \
+            --collect-all "customtkinter" \
+            --collect-all "yt_dlp" \
+            downloader.py
+
+      - name: Build with PyInstaller (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          pyinstaller --noconfirm --clean `
+            --onefile --windowed `
+            --name "VideoDownloader" `
+            --add-data "locales;locales" `
+            --add-data "icon.png;." `
+            --collect-all "customtkinter" `
+            --collect-all "yt_dlp" `
+            downloader.py
+
+      # --- Packaging Packages ---
+      - name: Package Linux (Binary / AppImage preparation)
+        if: runner.os == 'Linux'
+        run: |
+          chmod +x dist/VideoDownloader
+          cp dist/VideoDownloader ${{ matrix.asset_name }}
+
+      - name: Package Windows
+        if: runner.os == 'Windows'
+        run: |
+          Copy-Item dist/VideoDownloader.exe -Destination ${{ matrix.asset_name }}
+
+      - name: Package macOS
+        if: runner.os == 'macOS'
+        run: |
+          chmod +x dist/VideoDownloader
+          cp dist/VideoDownloader ${{ matrix.asset_name }}
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset_name }}
+          path: ${{ matrix.asset_name }}
+
+  release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release_assets
+
+      - name: Prepare assets list
+        id: assets
+        run: |
+          mkdir -p final_assets
+          find release_assets/ -type f -exec cp {} final_assets/ \;
+          ls -la final_assets/
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "VideoDownloader ${{ github.ref_name }} — Cross-Platform Release"
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          files: final_assets/*

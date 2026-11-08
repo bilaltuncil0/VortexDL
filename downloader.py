@@ -1,197 +1,290 @@
 """
-VideoDownloader - Modern masaüstü video indirme uygulaması
-Powered by yt-dlp + CustomTkinter + ffmpeg
+VideoDownloader - Modern Cross-Platform Video Downloader
+Version: 2.0.0
+Powered by yt-dlp + CustomTkinter + ffmpeg + aria2c
 """
 
 import customtkinter as ctk
 import threading
 import os
+import sys
 import re
-import yt_dlp
+import shutil
+import locale
+import gettext
 from pathlib import Path
 from tkinter import filedialog, messagebox
+import yt_dlp
+
+# --- i18n / Localization Setup ---
+APP_DIR = Path(__file__).resolve().parent
+LOCALES_DIR = APP_DIR / "locales"
+
+def get_system_language():
+    """Detect system language code with fallback to en_US."""
+    try:
+        sys_loc = locale.getdefaultlocale()[0]
+        if sys_loc and sys_loc.lower().startswith("tr"):
+            return "tr_TR"
+    except Exception:
+        pass
+    return "en_US"
+
+CURRENT_LANG = get_system_language()
+
+def setup_translation(lang_code):
+    global _
+    try:
+        t = gettext.translation(
+            domain="videodownloader",
+            localedir=str(LOCALES_DIR),
+            languages=[lang_code],
+            fallback=True
+        )
+        t.install()
+        _ = t.gettext
+    except Exception:
+        def _(text):
+            return text
+    return _
+
+setup_translation(CURRENT_LANG)
 
 
-# --- Tema & Renk Ayarları ---
+# --- Theme & Color Palette ---
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
 
-COLORS = {
-    "bg_primary":    "#1a1a2e",
-    "bg_secondary":  "#16213e",
-    "bg_card":       "#0f3460",
-    "accent":        "#e94560",
-    "accent_hover":  "#c73652",
-    "text_primary":  "#eaeaea",
-    "text_muted":    "#a0a0b0",
-    "success":       "#4caf50",
-    "warning":       "#ff9800",
-    "progress_fg":   "#00d4aa",
+THEME_CONFIGS = {
+    "dark": {
+        "bg_primary":    "#12121e",
+        "bg_secondary":  "#1a1a2e",
+        "bg_card":       "#1f2440",
+        "accent":        "#e94560",
+        "accent_hover":  "#c73652",
+        "text_primary":  "#ffffff",
+        "text_muted":    "#9ea3b5",
+        "success":       "#00e676",
+        "warning":       "#ffab00",
+        "progress_fg":   "#00d4aa",
+        "border":        "#2c3258",
+    },
+    "light": {
+        "bg_primary":    "#f4f6fa",
+        "bg_secondary":  "#ffffff",
+        "bg_card":       "#e8ecf4",
+        "accent":        "#d63031",
+        "accent_hover":  "#b71540",
+        "text_primary":  "#2d3436",
+        "text_muted":    "#636e72",
+        "success":       "#00b894",
+        "warning":       "#e17055",
+        "progress_fg":   "#0984e3",
+        "border":        "#dfe6e9",
+    }
 }
 
+COLORS = THEME_CONFIGS["dark"]
 
-# ---------------------------------------------------------------------------
-# Yardımcı: ANSI renk kodlarını temizle
-# ---------------------------------------------------------------------------
 _ANSI_RE = re.compile(r"\x1b\[[0-9;]*m")
 
 def strip_ansi(text: str) -> str:
     return _ANSI_RE.sub("", text)
 
 
-# ---------------------------------------------------------------------------
-# Ana Uygulama Sınıfı
-# ---------------------------------------------------------------------------
 class VideoDownloaderApp(ctk.CTk):
     def __init__(self):
         super().__init__()
 
-        self.title("🎬 VideoDownloader")
-        self.geometry("780x620")
-        self.minsize(680, 560)
+        self.current_lang = CURRENT_LANG
+        self.title("🎬 VideoDownloader v2.0.0")
+        self.geometry("820x680")
+        self.minsize(740, 600)
         self.configure(fg_color=COLORS["bg_primary"])
 
-        # İkon (opsiyonel – yoksa sessizce geç)
-        try:
-            self.iconbitmap("icon.ico")
-        except Exception:
-            pass
+        # Check for icon
+        icon_path = APP_DIR / "icon.png"
+        if icon_path.exists():
+            try:
+                self.iconbitmap(str(icon_path))
+            except Exception:
+                pass
 
-        # İndirme dizini (varsayılan: ~/Downloads)
+        # Check aria2c availability
+        self.aria2_path = shutil.which("aria2c")
+        self.has_aria2 = self.aria2_path is not None
+
+        # Download directory
         self.download_dir = str(Path.home() / "Downloads")
 
-        # Durum bayrakları
+        # Runtime flags
         self._is_downloading = False
         self._cancel_flag = False
 
         self._build_ui()
 
-    # -----------------------------------------------------------------------
-    # Arayüz inşası
-    # -----------------------------------------------------------------------
     def _build_ui(self):
-        # --- Başlık ---
-        header = ctk.CTkFrame(self, fg_color=COLORS["bg_secondary"], corner_radius=0, height=70)
-        header.pack(fill="x", padx=0, pady=0)
-        header.pack_propagate(False)
+        # Header
+        self.header = ctk.CTkFrame(self, fg_color=COLORS["bg_secondary"], corner_radius=0, height=75)
+        self.header.pack(fill="x", padx=0, pady=0)
+        self.header.pack_propagate(False)
 
-        ctk.CTkLabel(
-            header,
+        title_box = ctk.CTkFrame(self.header, fg_color="transparent")
+        title_box.pack(side="left", padx=20, pady=10)
+
+        self.title_lbl = ctk.CTkLabel(
+            title_box,
             text="🎬  VideoDownloader",
             font=ctk.CTkFont(family="Helvetica", size=22, weight="bold"),
             text_color=COLORS["text_primary"],
-        ).pack(side="left", padx=24, pady=0)
+        )
+        self.title_lbl.pack(anchor="w")
 
-        ctk.CTkLabel(
-            header,
-            text="yt-dlp · ffmpeg · CustomTkinter",
+        sub_text = "yt-dlp · ffmpeg"
+        if self.has_aria2:
+            sub_text += " · ⚡ aria2c"
+        self.sub_lbl = ctk.CTkLabel(
+            title_box,
+            text=sub_text,
             font=ctk.CTkFont(size=11),
-            text_color=COLORS["text_muted"],
-        ).pack(side="right", padx=24)
+            text_color=COLORS["progress_fg"] if self.has_aria2 else COLORS["text_muted"],
+        )
+        self.sub_lbl.pack(anchor="w")
 
-        # --- Ana içerik çerçevesi ---
-        content = ctk.CTkFrame(self, fg_color="transparent")
-        content.pack(fill="both", expand=True, padx=20, pady=16)
+        # Top Right Controls (Theme & Lang)
+        controls_box = ctk.CTkFrame(self.header, fg_color="transparent")
+        controls_box.pack(side="right", padx=20, pady=12)
 
-        # Kart: URL girişi
-        self._build_url_card(content)
+        # Language Selector
+        self.lang_var = ctk.StringVar(value="Türkçe" if self.current_lang == "tr_TR" else "English")
+        self.lang_menu = ctk.CTkOptionMenu(
+            controls_box,
+            values=["Türkçe", "English"],
+            variable=self.lang_var,
+            width=100,
+            height=30,
+            fg_color=COLORS["bg_card"],
+            button_color=COLORS["bg_card"],
+            button_hover_color=COLORS["accent"],
+            font=ctk.CTkFont(size=11),
+            command=self._change_language
+        )
+        self.lang_menu.pack(side="right", padx=(8, 0))
 
-        # Kart: Ayarlar (format + kalite + dizin)
-        self._build_settings_card(content)
+        # Theme Selector (Dark / Light / System)
+        self.theme_var = ctk.StringVar(value=_("Dark"))
+        self.theme_menu = ctk.CTkOptionMenu(
+            controls_box,
+            values=[_("Dark"), _("Light"), _("System")],
+            variable=self.theme_var,
+            width=105,
+            height=30,
+            fg_color=COLORS["bg_card"],
+            button_color=COLORS["bg_card"],
+            button_hover_color=COLORS["accent"],
+            font=ctk.CTkFont(size=11),
+            command=self._change_theme
+        )
+        self.theme_menu.pack(side="right", padx=(0, 4))
 
-        # Kart: İndirme butonu + ilerleme
-        self._build_progress_card(content)
+        # Main Scrollable / Frame Content
+        self.content = ctk.CTkFrame(self, fg_color="transparent")
+        self.content.pack(fill="both", expand=True, padx=20, pady=12)
 
-        # Kart: Log
-        self._build_log_card(content)
+        self._build_url_card(self.content)
+        self._build_settings_card(self.content)
+        self._build_progress_card(self.content)
+        self._build_log_card(self.content)
 
-    # -----------------------------------------------------------------------
     def _build_url_card(self, parent):
-        card = self._make_card(parent, "🔗  Video URL")
+        self.url_card = self._make_card(parent, f"🔗  {_('Video URL')}")
 
         self.url_entry = ctk.CTkEntry(
-            card,
-            placeholder_text="YouTube, Instagram, TikTok, Vimeo… URL'yi buraya yapıştırın",
-            font=ctk.CTkFont(size=14),
-            height=46,
-            border_color=COLORS["bg_card"],
-            fg_color=COLORS["bg_secondary"],
+            self.url_card,
+            placeholder_text=_("Paste URL here (YouTube, Instagram, TikTok, Twitter...)"),
+            font=ctk.CTkFont(size=13),
+            height=44,
+            border_color=COLORS["border"],
+            fg_color=COLORS["bg_primary"],
             text_color=COLORS["text_primary"],
         )
-        self.url_entry.pack(fill="x", padx=16, pady=(4, 12))
+        self.url_entry.pack(fill="x", padx=16, pady=(4, 10))
 
-        # Yapıştır & Temizle butonları
-        btn_row = ctk.CTkFrame(card, fg_color="transparent")
-        btn_row.pack(fill="x", padx=16, pady=(0, 12))
+        btn_row = ctk.CTkFrame(self.url_card, fg_color="transparent")
+        btn_row.pack(fill="x", padx=16, pady=(0, 10))
 
-        ctk.CTkButton(
+        self.btn_paste = ctk.CTkButton(
             btn_row,
-            text="📋  Yapıştır",
+            text=f"📋  {_('Paste')}",
             width=110,
             height=32,
             fg_color=COLORS["bg_card"],
             hover_color=COLORS["accent"],
             font=ctk.CTkFont(size=12),
             command=self._paste_url,
-        ).pack(side="left", padx=(0, 8))
+        )
+        self.btn_paste.pack(side="left", padx=(0, 8))
 
-        ctk.CTkButton(
+        self.btn_clear = ctk.CTkButton(
             btn_row,
-            text="✖  Temizle",
+            text=f"✖  {_('Clear')}",
             width=110,
             height=32,
             fg_color=COLORS["bg_card"],
-            hover_color="#555",
+            hover_color="#555555",
             font=ctk.CTkFont(size=12),
             command=lambda: self.url_entry.delete(0, "end"),
-        ).pack(side="left")
+        )
+        self.btn_clear.pack(side="left")
 
-    # -----------------------------------------------------------------------
     def _build_settings_card(self, parent):
-        card = self._make_card(parent, "⚙️  Ayarlar")
-        row = ctk.CTkFrame(card, fg_color="transparent")
+        self.settings_card = self._make_card(parent, f"⚙️  {_('Settings')}")
+        row = ctk.CTkFrame(self.settings_card, fg_color="transparent")
         row.pack(fill="x", padx=16, pady=(4, 12))
 
-        # Format
+        # Format Option
         fmt_frame = ctk.CTkFrame(row, fg_color="transparent")
-        fmt_frame.pack(side="left", fill="x", expand=True, padx=(0, 12))
-        ctk.CTkLabel(fmt_frame, text="Format", text_color=COLORS["text_muted"],
-                     font=ctk.CTkFont(size=12)).pack(anchor="w")
-        self.format_var = ctk.StringVar(value="MP4 (Video)")
+        fmt_frame.pack(side="left", fill="x", expand=True, padx=(0, 10))
+        self.fmt_lbl = ctk.CTkLabel(fmt_frame, text=_("Format"), text_color=COLORS["text_muted"], font=ctk.CTkFont(size=12))
+        self.fmt_lbl.pack(anchor="w")
+
+        self.format_var = ctk.StringVar(value=_("Video (MP4)"))
         self.format_menu = ctk.CTkOptionMenu(
             fmt_frame,
-            values=["MP4 (Video)", "MP3 (Ses)"],
+            values=[_("Video (MP4)"), _("Audio Only (MP3)")],
             variable=self.format_var,
             fg_color=COLORS["bg_card"],
             button_color=COLORS["bg_card"],
             button_hover_color=COLORS["accent"],
-            font=ctk.CTkFont(size=13),
+            font=ctk.CTkFont(size=12),
             command=self._on_format_change,
         )
         self.format_menu.pack(fill="x", pady=(4, 0))
 
-        # Kalite
+        # Quality Option
         qual_frame = ctk.CTkFrame(row, fg_color="transparent")
-        qual_frame.pack(side="left", fill="x", expand=True, padx=(0, 12))
-        ctk.CTkLabel(qual_frame, text="Kalite", text_color=COLORS["text_muted"],
-                     font=ctk.CTkFont(size=12)).pack(anchor="w")
-        self.quality_var = ctk.StringVar(value="En Yüksek")
+        qual_frame.pack(side="left", fill="x", expand=True, padx=(0, 10))
+        self.qual_lbl = ctk.CTkLabel(qual_frame, text=_("Quality"), text_color=COLORS["text_muted"], font=ctk.CTkFont(size=12))
+        self.qual_lbl.pack(anchor="w")
+
+        self.quality_var = ctk.StringVar(value=_("Best Quality"))
         self.quality_menu = ctk.CTkOptionMenu(
             qual_frame,
-            values=["En Yüksek", "1080p", "720p", "480p", "360p"],
+            values=[_("Best Quality"), "1080p", "720p", "480p", "360p"],
             variable=self.quality_var,
             fg_color=COLORS["bg_card"],
             button_color=COLORS["bg_card"],
             button_hover_color=COLORS["accent"],
-            font=ctk.CTkFont(size=13),
+            font=ctk.CTkFont(size=12),
         )
         self.quality_menu.pack(fill="x", pady=(4, 0))
 
-        # Dizin
+        # Destination Folder
         dir_frame = ctk.CTkFrame(row, fg_color="transparent")
         dir_frame.pack(side="left", fill="x", expand=True)
-        ctk.CTkLabel(dir_frame, text="Kayıt Klasörü", text_color=COLORS["text_muted"],
-                     font=ctk.CTkFont(size=12)).pack(anchor="w")
+        self.dir_title_lbl = ctk.CTkLabel(dir_frame, text=_("Save Folder"), text_color=COLORS["text_muted"], font=ctk.CTkFont(size=12))
+        self.dir_title_lbl.pack(anchor="w")
+
         dir_btn_row = ctk.CTkFrame(dir_frame, fg_color="transparent")
         dir_btn_row.pack(fill="x", pady=(4, 0))
         self.dir_label = ctk.CTkLabel(
@@ -202,6 +295,7 @@ class VideoDownloaderApp(ctk.CTk):
             anchor="w",
         )
         self.dir_label.pack(side="left", fill="x", expand=True)
+
         ctk.CTkButton(
             dir_btn_row,
             text="📁",
@@ -212,17 +306,16 @@ class VideoDownloaderApp(ctk.CTk):
             command=self._choose_dir,
         ).pack(side="right")
 
-    # -----------------------------------------------------------------------
     def _build_progress_card(self, parent):
-        card = self._make_card(parent, "📥  İndirme")
-        inner = ctk.CTkFrame(card, fg_color="transparent")
+        self.progress_card = self._make_card(parent, f"📥  {_('Download')}")
+        inner = ctk.CTkFrame(self.progress_card, fg_color="transparent")
         inner.pack(fill="x", padx=16, pady=(4, 12))
 
-        # İndir / İptal butonu
+        # Main Download Button
         self.download_btn = ctk.CTkButton(
             inner,
-            text="⬇  İndir",
-            height=46,
+            text=f"⬇  {_('Download')}",
+            height=44,
             font=ctk.CTkFont(size=15, weight="bold"),
             fg_color=COLORS["accent"],
             hover_color=COLORS["accent_hover"],
@@ -230,83 +323,109 @@ class VideoDownloaderApp(ctk.CTk):
         )
         self.download_btn.pack(fill="x", pady=(0, 10))
 
-        # İlerleme çubuğu + yüzde
+        # Progress bar + Percent & Speed Box
         prog_row = ctk.CTkFrame(inner, fg_color="transparent")
         prog_row.pack(fill="x")
 
         self.progress_bar = ctk.CTkProgressBar(
             prog_row,
             mode="determinate",
-            height=16,
+            height=18,
             progress_color=COLORS["progress_fg"],
-            fg_color=COLORS["bg_secondary"],
-            corner_radius=8,
+            fg_color=COLORS["bg_primary"],
+            corner_radius=9,
         )
-        self.progress_bar.pack(side="left", fill="x", expand=True, padx=(0, 10))
+        self.progress_bar.pack(side="left", fill="x", expand=True, padx=(0, 12))
         self.progress_bar.set(0)
 
         self.percent_label = ctk.CTkLabel(
             prog_row,
             text="0%",
-            width=48,
+            width=50,
             font=ctk.CTkFont(size=13, weight="bold"),
             text_color=COLORS["progress_fg"],
         )
         self.percent_label.pack(side="right")
 
-        # Durum etiketi
+        # Live Status (Speed, ETA, etc.)
         self.status_label = ctk.CTkLabel(
             inner,
-            text="Hazır",
+            text=_("Ready"),
             font=ctk.CTkFont(size=12),
             text_color=COLORS["text_muted"],
             anchor="w",
         )
         self.status_label.pack(fill="x", pady=(6, 0))
 
-    # -----------------------------------------------------------------------
     def _build_log_card(self, parent):
-        card = self._make_card(parent, "📋  Log", expand=True)
+        self.log_card = self._make_card(parent, f"📋  {_('Log')}", expand=True)
 
         self.log_box = ctk.CTkTextbox(
-            card,
+            self.log_card,
             font=ctk.CTkFont(family="Monospace", size=11),
-            fg_color=COLORS["bg_secondary"],
+            fg_color=COLORS["bg_primary"],
             text_color=COLORS["text_muted"],
             wrap="word",
             state="disabled",
         )
         self.log_box.pack(fill="both", expand=True, padx=16, pady=(4, 12))
 
-    # -----------------------------------------------------------------------
-    # Kart fabrikası
-    # -----------------------------------------------------------------------
     def _make_card(self, parent, title: str, expand: bool = False) -> ctk.CTkFrame:
         wrapper = ctk.CTkFrame(
             parent,
             fg_color=COLORS["bg_secondary"],
             corner_radius=12,
             border_width=1,
-            border_color=COLORS["bg_card"],
+            border_color=COLORS["border"],
         )
         wrapper.pack(fill="both", expand=expand, pady=(0, 10))
 
-        ctk.CTkLabel(
+        lbl = ctk.CTkLabel(
             wrapper,
             text=title,
             font=ctk.CTkFont(size=13, weight="bold"),
             text_color=COLORS["text_primary"],
             anchor="w",
-        ).pack(fill="x", padx=16, pady=(10, 0))
+        )
+        lbl.pack(fill="x", padx=16, pady=(10, 0))
 
-        sep = ctk.CTkFrame(wrapper, height=1, fg_color=COLORS["bg_card"])
+        sep = ctk.CTkFrame(wrapper, height=1, fg_color=COLORS["border"])
         sep.pack(fill="x", padx=16, pady=(6, 0))
 
         return wrapper
 
-    # -----------------------------------------------------------------------
-    # Yardımcı UI metotları
-    # -----------------------------------------------------------------------
+    # --- UI Theme & Language Handlers ---
+    def _change_theme(self, choice):
+        global COLORS
+        if choice in [_("Dark"), "Dark", "Karanlık"]:
+            ctk.set_appearance_mode("dark")
+            COLORS = THEME_CONFIGS["dark"]
+        elif choice in [_("Light"), "Light", "Açık"]:
+            ctk.set_appearance_mode("light")
+            COLORS = THEME_CONFIGS["light"]
+        else:
+            ctk.set_appearance_mode("system")
+            COLORS = THEME_CONFIGS["dark"]
+        self._refresh_colors()
+
+    def _refresh_colors(self):
+        self.configure(fg_color=COLORS["bg_primary"])
+        self.header.configure(fg_color=COLORS["bg_secondary"])
+        self.title_lbl.configure(text_color=COLORS["text_primary"])
+        self.progress_bar.configure(progress_color=COLORS["progress_fg"], fg_color=COLORS["bg_primary"])
+        self.percent_label.configure(text_color=COLORS["progress_fg"])
+        self.download_btn.configure(fg_color=COLORS["accent"], hover_color=COLORS["accent_hover"])
+
+    def _change_language(self, choice):
+        new_lang = "tr_TR" if choice == "Türkçe" else "en_US"
+        if new_lang != self.current_lang:
+            self.current_lang = new_lang
+            setup_translation(new_lang)
+            # Rebuild whole UI to cleanly re-translate all labels
+            for widget in self.winfo_children():
+                widget.destroy()
+            self._build_ui()
+
     def _paste_url(self):
         try:
             text = self.clipboard_get()
@@ -322,16 +441,14 @@ class VideoDownloaderApp(ctk.CTk):
             self.dir_label.configure(text=self._short_path(path))
 
     def _on_format_change(self, value):
-        is_audio = value == "MP3 (Ses)"
+        is_audio = value in [_("Audio Only (MP3)"), "MP3 (Ses)", "Audio Only (MP3)"]
         self.quality_menu.configure(state="disabled" if is_audio else "normal")
 
     @staticmethod
     def _short_path(path: str, max_len: int = 28) -> str:
         return path if len(path) <= max_len else "…" + path[-(max_len - 1):]
 
-    # -----------------------------------------------------------------------
-    # Log metotları (thread-safe)
-    # -----------------------------------------------------------------------
+    # --- Thread-Safe Logging & Progress ---
     def _log(self, msg: str):
         clean = strip_ansi(msg)
         self.after(0, self._append_log, clean)
@@ -347,9 +464,6 @@ class VideoDownloaderApp(ctk.CTk):
         self.log_box.delete("1.0", "end")
         self.log_box.configure(state="disabled")
 
-    # -----------------------------------------------------------------------
-    # UI güncelleme (thread-safe)
-    # -----------------------------------------------------------------------
     def _set_progress(self, value: float, percent_text: str, status: str):
         self.after(0, self._update_progress_widgets, value, percent_text, status)
 
@@ -365,38 +479,34 @@ class VideoDownloaderApp(ctk.CTk):
     def _toggle_btn(self, downloading: bool):
         if downloading:
             self.download_btn.configure(
-                text="⏹  İptal Et",
-                fg_color="#555",
-                hover_color="#444",
+                text=f"⏹  {_('Cancel')}",
+                fg_color="#555555",
+                hover_color="#333333",
                 command=self._cancel_download,
             )
         else:
             self.download_btn.configure(
-                text="⬇  İndir",
+                text=f"⬇  {_('Download')}",
                 fg_color=COLORS["accent"],
                 hover_color=COLORS["accent_hover"],
                 command=self._start_download,
             )
 
-    # -----------------------------------------------------------------------
-    # İptal
-    # -----------------------------------------------------------------------
     def _cancel_download(self):
         self._cancel_flag = True
-        self._log("⚠  İptal isteği gönderildi…")
-        self.status_label.configure(text="İptal ediliyor…", text_color=COLORS["warning"])
+        self._log(f"⚠  {_('Cancellation requested...')}")
+        self.status_label.configure(text=_("Cancellation requested..."), text_color=COLORS["warning"])
 
-    # -----------------------------------------------------------------------
-    # yt-dlp format dizesi
-    # -----------------------------------------------------------------------
     def _build_format_string(self) -> str:
         fmt = self.format_var.get()
         qual = self.quality_var.get()
 
-        if fmt == "MP3 (Ses)":
+        if fmt in [_("Audio Only (MP3)"), "MP3 (Ses)", "Audio Only (MP3)"]:
             return "bestaudio/best"
 
         quality_map = {
+            _("Best Quality"): "bestvideo+bestaudio/best",
+            "Best Quality": "bestvideo+bestaudio/best",
             "En Yüksek": "bestvideo+bestaudio/best",
             "1080p": "bestvideo[height<=1080]+bestaudio/best[height<=1080]/best",
             "720p":  "bestvideo[height<=720]+bestaudio/best[height<=720]/best",
@@ -405,13 +515,10 @@ class VideoDownloaderApp(ctk.CTk):
         }
         return quality_map.get(qual, "bestvideo+bestaudio/best")
 
-    # -----------------------------------------------------------------------
-    # İndirme başlat
-    # -----------------------------------------------------------------------
     def _start_download(self):
         url = self.url_entry.get().strip()
         if not url:
-            messagebox.showwarning("Uyarı", "Lütfen bir URL girin!")
+            messagebox.showwarning(_("Warning"), _("Please enter a valid URL!"))
             return
         if self._is_downloading:
             return
@@ -419,26 +526,21 @@ class VideoDownloaderApp(ctk.CTk):
         self._cancel_flag = False
         self._clear_log()
         self._set_downloading_state(True)
-        self._set_progress(0, "0%", "Bağlanıyor…")
+        self._set_progress(0, "0%", _("Connecting..."))
         self.status_label.configure(text_color=COLORS["text_muted"])
 
         thread = threading.Thread(target=self._download_worker, args=(url,), daemon=True)
         thread.start()
 
-    # -----------------------------------------------------------------------
-    # İndirme iş parçacığı
-    # -----------------------------------------------------------------------
     def _download_worker(self, url: str):
         fmt = self.format_var.get()
-        is_audio = fmt == "MP3 (Ses)"
+        is_audio = fmt in [_("Audio Only (MP3)"), "MP3 (Ses)", "Audio Only (MP3)"]
         format_str = self._build_format_string()
 
-        # yt-dlp seçenekleri
         ydl_opts: dict = {
             "format": format_str,
             "outtmpl": os.path.join(self.download_dir, "%(title)s.%(ext)s"),
             "merge_output_format": "mp4" if not is_audio else None,
-            "ffmpeg_location": "/usr/bin",   # genellikle burada; PATH'te de aranır
             "progress_hooks": [self._progress_hook],
             "postprocessor_hooks": [self._postprocessor_hook],
             "logger": _YTLogger(self._log),
@@ -446,6 +548,18 @@ class VideoDownloaderApp(ctk.CTk):
             "no_warnings": False,
             "noplaylist": False,
         }
+
+        # aria2c acceleration if installed
+        if self.has_aria2:
+            ydl_opts["external_downloader"] = "aria2c"
+            ydl_opts["external_downloader_args"] = [
+                "-x", "16",
+                "-s", "16",
+                "-k", "1M",
+                "--split=16",
+                "--min-split-size=1M"
+            ]
+            self._log(f"⚡ {_('aria2 accelerated')}: {self.aria2_path}")
 
         if is_audio:
             ydl_opts["postprocessors"] = [{
@@ -457,50 +571,45 @@ class VideoDownloaderApp(ctk.CTk):
 
         try:
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                self._log(f"🔍  URL analiz ediliyor: {url}")
+                self._log(f"🔍 {_('Analyzing URL: ')}{url}")
                 if self._cancel_flag:
-                    raise Exception("İptal edildi")
+                    raise Exception(_("Cancelled"))
                 ydl.download([url])
 
             if not self._cancel_flag:
-                self._set_progress(1.0, "100%", f"✅  Tamamlandı → {self._short_path(self.download_dir)}")
+                self._set_progress(1.0, "100%", f"✅ {_('Completed')} → {self._short_path(self.download_dir)}")
                 self.after(0, lambda: self.status_label.configure(text_color=COLORS["success"]))
-                self._log(f"✅  İndirme tamamlandı! Konum: {self.download_dir}")
+                self._log(f"✅ {_('Download completed! Location: ')}{self.download_dir}")
 
         except Exception as exc:
             err = str(exc)
             if self._cancel_flag:
-                self._set_progress(0, "0%", "⚠  İptal edildi")
+                self._set_progress(0, "0%", f"⚠ {_('Cancelled')}")
                 self.after(0, lambda: self.status_label.configure(text_color=COLORS["warning"]))
-                self._log("⚠  İndirme iptal edildi.")
+                self._log(f"⚠ {_('Cancelled')}")
             else:
-                self._set_progress(0, "0%", "❌  Hata oluştu")
+                self._set_progress(0, "0%", f"❌ {_('Error occurred')}")
                 self.after(0, lambda: self.status_label.configure(text_color=COLORS["accent"]))
-                self._log(f"❌  Hata: {err}")
+                self._log(f"❌ {_('Error: ')}{err}")
         finally:
             self._set_downloading_state(False)
 
-    # -----------------------------------------------------------------------
-    # yt-dlp ilerleme kancası
-    # -----------------------------------------------------------------------
     def _progress_hook(self, d: dict):
         if self._cancel_flag:
-            raise Exception("Kullanıcı iptal etti")
+            raise Exception("Cancelled by user")
 
         status = d.get("status", "")
 
         if status == "downloading":
-            # Yüzde
             pct_str = strip_ansi(d.get("_percent_str", "0%")).strip()
             try:
                 pct_val = float(pct_str.replace("%", "")) / 100.0
             except ValueError:
                 pct_val = 0.0
 
-            # Hız & ETA
             speed  = strip_ansi(d.get("_speed_str", "")).strip()
             eta    = strip_ansi(d.get("_eta_str", "")).strip()
-            status_txt = f"İndiriliyor… {pct_str}"
+            status_txt = f"{_('Downloading...')} {pct_str}"
             if speed:
                 status_txt += f"  |  {speed}"
             if eta:
@@ -509,23 +618,17 @@ class VideoDownloaderApp(ctk.CTk):
             self._set_progress(pct_val, pct_str, status_txt)
 
         elif status == "finished":
-            self._set_progress(0.95, "95%", "🔀  Birleştiriliyor (ffmpeg)…")
-            self._log(f"⬇  İndirildi: {d.get('filename', '')}")
+            self._set_progress(0.95, "95%", f"🔀 {_('Merging streams (ffmpeg)...')}")
+            self._log(f"⬇ {_('Downloaded: ')}{d.get('filename', '')}")
 
         elif status == "error":
-            self._log(f"❌  İndirme hatası: {d.get('filename', '')}")
+            self._log(f"❌ {_('Error occurred')}: {d.get('filename', '')}")
 
-    # -----------------------------------------------------------------------
-    # yt-dlp işlem sonrası kanca (birleştirme tamamlandı)
-    # -----------------------------------------------------------------------
     def _postprocessor_hook(self, d: dict):
         if d.get("status") == "finished":
-            self._set_progress(1.0, "100%", "✅  İşlem tamamlandı")
+            self._set_progress(1.0, "100%", f"✅ {_('Merging completed')}")
 
 
-# ---------------------------------------------------------------------------
-# yt-dlp özel logger
-# ---------------------------------------------------------------------------
 class _YTLogger:
     def __init__(self, log_fn):
         self._log = log_fn
@@ -545,9 +648,6 @@ class _YTLogger:
         self._log(f"❌  {msg}")
 
 
-# ---------------------------------------------------------------------------
-# Giriş noktası
-# ---------------------------------------------------------------------------
 if __name__ == "__main__":
     app = VideoDownloaderApp()
     app.mainloop()

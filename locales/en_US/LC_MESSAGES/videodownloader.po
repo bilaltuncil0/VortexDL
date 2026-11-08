@@ -1,0 +1,120 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: VideoDownloader 2.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-08 22:45+0300\n"
+"PO-Revision-Date: 2026-11-08 22:45+0300\n"
+"Last-Translator: Bilal <bilal@videodownloader>\n"
+"Language-Team: English\n"
+"Language: en_US\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "VideoDownloader"
+msgstr "VideoDownloader"
+
+msgid "Video URL"
+msgstr "Video URL"
+
+msgid "Paste URL here (YouTube, Instagram, TikTok, Twitter...)"
+msgstr "Paste URL here (YouTube, Instagram, TikTok, Twitter...)"
+
+msgid "Paste"
+msgstr "Paste"
+
+msgid "Clear"
+msgstr "Clear"
+
+msgid "Settings"
+msgstr "Settings"
+
+msgid "Format"
+msgstr "Format"
+
+msgid "Video (MP4)"
+msgstr "Video (MP4)"
+
+msgid "Audio Only (MP3)"
+msgstr "Audio Only (MP3)"
+
+msgid "Quality"
+msgstr "Quality"
+
+msgid "Best Quality"
+msgstr "Best Quality"
+
+msgid "Save Folder"
+msgstr "Save Folder"
+
+msgid "Theme"
+msgstr "Theme"
+
+msgid "Dark"
+msgstr "Dark"
+
+msgid "Light"
+msgstr "Light"
+
+msgid "System"
+msgstr "System"
+
+msgid "Language"
+msgstr "Language"
+
+msgid "Download"
+msgstr "Download"
+
+msgid "Cancel"
+msgstr "Cancel"
+
+msgid "Ready"
+msgstr "Ready"
+
+msgid "Log"
+msgstr "Log"
+
+msgid "Warning"
+msgstr "Warning"
+
+msgid "Please enter a valid URL!"
+msgstr "Please enter a valid URL!"
+
+msgid "Connecting..."
+msgstr "Connecting..."
+
+msgid "Downloading..."
+msgstr "Downloading..."
+
+msgid "Merging streams (ffmpeg)..."
+msgstr "Merging streams (ffmpeg)..."
+
+msgid "Merging completed"
+msgstr "Merging completed"
+
+msgid "Completed"
+msgstr "Completed"
+
+msgid "Cancelled"
+msgstr "Cancelled"
+
+msgid "Cancellation requested..."
+msgstr "Cancellation requested..."
+
+msgid "Error occurred"
+msgstr "Error occurred"
+
+msgid "Error: "
+msgstr "Error: "
+
+msgid "Analyzing URL: "
+msgstr "Analyzing URL: "
+
+msgid "Download completed! Location: "
+msgstr "Download completed! Location: "
+
+msgid "Downloaded: "
+msgstr "Downloaded: "
+
+msgid "aria2 accelerated"
+msgstr "aria2 accelerated"

@@ -1,14 +1,16 @@
 # -*- mode: python ; coding: utf-8 -*-
 from PyInstaller.utils.hooks import collect_all
+import os
 
-datas = [('icon.png', '.'), ('/home/bilal/.gemini/antigravity/scratch/VideoDownloader/.venv/lib/python3.12/site-packages/customtkinter', 'customtkinter')]
+datas = [('icon.png', '.'), ('locales', 'locales')]
 binaries = []
-hiddenimports = ['yt_dlp.extractor._extractors', 'yt_dlp.utils']
+hiddenimports = ['yt_dlp.extractor._extractors', 'yt_dlp.utils', 'gettext', 'locale']
+
 tmp_ret = collect_all('yt_dlp')
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
+
 tmp_ret = collect_all('customtkinter')
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
-
 
 a = Analysis(
     ['downloader.py'],

@@ -1,7 +1,5 @@
-# Runtime dependencies
-customtkinter>=5.2.0,<7.0.0
-yt-dlp>=2024.1.0
-darkdetect>=0.8.0
-
-# Build / packaging tools
-pyinstaller>=6.0.0
+# VideoDownloader v2.0.0 Development / Packaging Dependencies
+customtkinter==6.0.0
+yt-dlp==2026.10.26
+darkdetect==0.8.0
+pyinstaller==6.22.3

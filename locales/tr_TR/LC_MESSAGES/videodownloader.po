@@ -1,0 +1,120 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: VideoDownloader 2.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-08 22:45+0300\n"
+"PO-Revision-Date: 2026-11-08 22:45+0300\n"
+"Last-Translator: Bilal <bilal@videodownloader>\n"
+"Language-Team: Turkish\n"
+"Language: tr_TR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "VideoDownloader"
+msgstr "VideoDownloader"
+
+msgid "Video URL"
+msgstr "Video URL"
+
+msgid "Paste URL here (YouTube, Instagram, TikTok, Twitter...)"
+msgstr "YouTube, Instagram, TikTok, Twitter… URL'yi buraya yapıştırın"
+
+msgid "Paste"
+msgstr "Yapıştır"
+
+msgid "Clear"
+msgstr "Temizle"
+
+msgid "Settings"
+msgstr "Ayarlar"
+
+msgid "Format"
+msgstr "Format"
+
+msgid "Video (MP4)"
+msgstr "MP4 (Video)"
+
+msgid "Audio Only (MP3)"
+msgstr "Sadece Ses (MP3)"
+
+msgid "Quality"
+msgstr "Kalite"
+
+msgid "Best Quality"
+msgstr "En Yüksek"
+
+msgid "Save Folder"
+msgstr "Kayıt Klasörü"
+
+msgid "Theme"
+msgstr "Tema"
+
+msgid "Dark"
+msgstr "Karanlık"
+
+msgid "Light"
+msgstr "Açık"
+
+msgid "System"
+msgstr "Sistem"
+
+msgid "Language"
+msgstr "Dil"
+
+msgid "Download"
+msgstr "İndir"
+
+msgid "Cancel"
+msgstr "İptal Et"
+
+msgid "Ready"
+msgstr "Hazır"
+
+msgid "Log"
+msgstr "Log"
+
+msgid "Warning"
+msgstr "Uyarı"
+
+msgid "Please enter a valid URL!"
+msgstr "Lütfen geçerli bir URL girin!"
+
+msgid "Connecting..."
+msgstr "Bağlanıyor…"
+
+msgid "Downloading..."
+msgstr "İndiriliyor…"
+
+msgid "Merging streams (ffmpeg)..."
+msgstr "Birleştiriliyor (ffmpeg)…"
+
+msgid "Merging completed"
+msgstr "Birleştirme tamamlandı"
+
+msgid "Completed"
+msgstr "Tamamlandı"
+
+msgid "Cancelled"
+msgstr "İptal edildi"
+
+msgid "Cancellation requested..."
+msgstr "İptal isteği gönderildi…"
+
+msgid "Error occurred"
+msgstr "Hata oluştu"
+
+msgid "Error: "
+msgstr "Hata: "
+
+msgid "Analyzing URL: "
+msgstr "URL analiz ediliyor: "
+
+msgid "Download completed! Location: "
+msgstr "İndirme tamamlandı! Konum: "
+
+msgid "Downloaded: "
+msgstr "İndirildi: "
+
+msgid "aria2 accelerated"
+msgstr "aria2 hızlandırıldı"
