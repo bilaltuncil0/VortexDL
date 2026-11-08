@@ -20,8 +20,8 @@ ENV/
 # ── PyInstaller build output ──────────────────────────────────
 build/
 dist/
-*.spec
-!build_linux.spec          # keep our custom spec if it exists
+# Note: VideoDownloader.spec is committed for reproducible builds
+# *.spec
 
 # ── AppImage build artifacts ──────────────────────────────────
 AppDir/
