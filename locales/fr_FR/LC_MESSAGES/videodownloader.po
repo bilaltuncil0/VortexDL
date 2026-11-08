@@ -1,0 +1,164 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: VortexDL 3.0.0\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: fr_FR\n"
+
+msgid "VortexDL"
+msgstr "VortexDL"
+
+msgid "Video URL"
+msgstr "URL de la vidéo"
+
+msgid "Paste URL here (YouTube, Instagram, TikTok, Twitter...)"
+msgstr "Coller l'URL ici (YouTube, Instagram, TikTok, Twitter...)"
+
+msgid "Paste"
+msgstr "Coller"
+
+msgid "Clear"
+msgstr "Effacer"
+
+msgid "Settings"
+msgstr "Paramètres"
+
+msgid "Format"
+msgstr "Format"
+
+msgid "Video (MP4)"
+msgstr "Vidéo (MP4)"
+
+msgid "Audio Only (MP3)"
+msgstr "Audio uniquement (MP3)"
+
+msgid "Quality"
+msgstr "Qualité"
+
+msgid "Best Quality"
+msgstr "Meilleure qualité"
+
+msgid "Save Folder"
+msgstr "Dossier d'enregistrement"
+
+msgid "Theme"
+msgstr "Thème"
+
+msgid "Dark"
+msgstr "Sombre"
+
+msgid "Light"
+msgstr "Clair"
+
+msgid "System"
+msgstr "Système"
+
+msgid "Language"
+msgstr "Langue"
+
+msgid "Download"
+msgstr "Télécharger"
+
+msgid "Cancel"
+msgstr "Annuler"
+
+msgid "Ready"
+msgstr "Prêt"
+
+msgid "Log"
+msgstr "Journaux"
+
+msgid "Warning"
+msgstr "Avertissement"
+
+msgid "Please enter a valid URL!"
+msgstr "Veuillez entrer une URL valide !"
+
+msgid "Connecting..."
+msgstr "Connexion en cours..."
+
+msgid "Downloading..."
+msgstr "Téléchargement en cours..."
+
+msgid "Merging streams (ffmpeg)..."
+msgstr "Fusion des flux (ffmpeg)..."
+
+msgid "Merging completed"
+msgstr "Fusion terminée"
+
+msgid "Completed"
+msgstr "Terminé"
+
+msgid "Cancelled"
+msgstr "Annulé"
+
+msgid "Cancellation requested..."
+msgstr "Annulation demandée..."
+
+msgid "Error occurred"
+msgstr "Une erreur est survenue"
+
+msgid "Error: "
+msgstr "Erreur : "
+
+msgid "Analyzing URL: "
+msgstr "Analyse de l'URL : "
+
+msgid "Download completed! Location: "
+msgstr "Téléchargement terminé ! Emplacement : "
+
+msgid "Downloaded: "
+msgstr "Téléchargé : "
+
+msgid "aria2 accelerated"
+msgstr "Accéléré par aria2"
+
+msgid "History"
+msgstr "Historique"
+
+msgid "Clear History"
+msgstr "Effacer l'historique"
+
+msgid "Default Quality"
+msgstr "Qualité par défaut"
+
+msgid "Default Save Folder"
+msgstr "Dossier par défaut"
+
+msgid "Disable Telemetry (Privacy Mode)"
+msgstr "Désactiver la télémétrie (Confidentialité)"
+
+msgid "Update Available"
+msgstr "Mise à jour disponible"
+
+msgid "New Version Available"
+msgstr "Nouvelle version disponible"
+
+msgid "Cloud Sync / Storage"
+msgstr "Synchronisation Cloud"
+
+msgid "Google Drive API Key"
+msgstr "Clé API Google Drive"
+
+msgid "OneDrive API Key"
+msgstr "Clé API OneDrive"
+
+msgid "Save Settings"
+msgstr "Enregistrer les paramètres"
+
+msgid "Settings saved successfully!"
+msgstr "Paramètres enregistrés avec succès !"
+
+msgid "No downloads yet."
+msgstr "Aucun téléchargement pour l'instant."
+
+msgid "Delete"
+msgstr "Supprimer"
+
+msgid "Open Folder"
+msgstr "Ouvrir le dossier"
+
+msgid "Notifications"
+msgstr "Notifications"
+

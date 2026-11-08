@@ -17,17 +17,14 @@ jobs:
       matrix:
         include:
           - os: ubuntu-22.04
-            artifact_name: VideoDownloader-linux-x86_64.AppImage
-            binary_name: VideoDownloader
-            asset_name: VideoDownloader-Linux-x86_64
+            binary_name: VortexDL
+            asset_name: VortexDL-Linux-x86_64
           - os: windows-latest
-            artifact_name: VideoDownloader.exe
-            binary_name: VideoDownloader.exe
-            asset_name: VideoDownloader-Windows-x64.exe
+            binary_name: VortexDL.exe
+            asset_name: VortexDL-Windows-x64.exe
           - os: macos-13
-            artifact_name: VideoDownloader.dmg
-            binary_name: VideoDownloader
-            asset_name: VideoDownloader-macOS-x64.dmg
+            binary_name: VortexDL
+            asset_name: VortexDL-macOS-x64.dmg
 
     steps:
       - name: Checkout Code
@@ -65,7 +62,7 @@ jobs:
         run: |
           python -c "
           import subprocess, os
-          for lang in ['tr_TR', 'en_US']:
+          for lang in ['tr_TR', 'en_US', 'de_DE', 'fr_FR', 'it_IT', 'ar_SA', 'zh_CN']:
               po = os.path.join('locales', lang, 'LC_MESSAGES', 'videodownloader.po')
               mo = os.path.join('locales', lang, 'LC_MESSAGES', 'videodownloader.mo')
               if os.path.exists(po):
@@ -75,44 +72,29 @@ jobs:
       - name: Build with PyInstaller (Linux / macOS)
         if: runner.os != 'Windows'
         run: |
-          pyinstaller --noconfirm --clean \
-            --onefile --windowed \
-            --name "VideoDownloader" \
-            --add-data "locales:locales" \
-            --add-data "icon.png:." \
-            --collect-all "customtkinter" \
-            --collect-all "yt_dlp" \
-            downloader.py
+          pyinstaller --noconfirm --clean VortexDL.spec
 
       - name: Build with PyInstaller (Windows)
         if: runner.os == 'Windows'
         run: |
-          pyinstaller --noconfirm --clean `
-            --onefile --windowed `
-            --name "VideoDownloader" `
-            --add-data "locales;locales" `
-            --add-data "icon.png;." `
-            --collect-all "customtkinter" `
-            --collect-all "yt_dlp" `
-            downloader.py
+          pyinstaller --noconfirm --clean VortexDL.spec
 
-      # --- Packaging Packages ---
-      - name: Package Linux (Binary / AppImage preparation)
+      - name: Package Linux
         if: runner.os == 'Linux'
         run: |
-          chmod +x dist/VideoDownloader
-          cp dist/VideoDownloader ${{ matrix.asset_name }}
+          chmod +x dist/VortexDL
+          cp dist/VortexDL ${{ matrix.asset_name }}
 
       - name: Package Windows
         if: runner.os == 'Windows'
         run: |
-          Copy-Item dist/VideoDownloader.exe -Destination ${{ matrix.asset_name }}
+          Copy-Item dist/VortexDL.exe -Destination ${{ matrix.asset_name }}
 
       - name: Package macOS
         if: runner.os == 'macOS'
         run: |
-          chmod +x dist/VideoDownloader
-          cp dist/VideoDownloader ${{ matrix.asset_name }}
+          chmod +x dist/VortexDL
+          cp dist/VortexDL ${{ matrix.asset_name }}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
@@ -140,7 +122,7 @@ jobs:
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: "VideoDownloader ${{ github.ref_name }} — Cross-Platform Release"
+          name: "VortexDL ${{ github.ref_name }} — Ultimate Release"
           draft: false
           prerelease: false
           generate_release_notes: true

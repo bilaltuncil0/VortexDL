@@ -1,5 +1,6 @@
-# VideoDownloader v2.0.0 Development / Packaging Dependencies
+# VideoDownloader / VortexDL v3.0.0 Development / Packaging Dependencies
 customtkinter==6.0.0
 yt-dlp==2026.10.26
 darkdetect==0.8.0
+Pillow>=10.0.0
 pyinstaller==6.22.3

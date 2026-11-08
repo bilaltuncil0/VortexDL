@@ -1,0 +1,164 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: VortexDL 3.0.0\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ar_SA\n"
+
+msgid "VortexDL"
+msgstr "VortexDL"
+
+msgid "Video URL"
+msgstr "رابط الفيديو"
+
+msgid "Paste URL here (YouTube, Instagram, TikTok, Twitter...)"
+msgstr "الصق الرابط هنا (يوتيوب، انستغرام، تيك توك، تويتر...)"
+
+msgid "Paste"
+msgstr "لصق"
+
+msgid "Clear"
+msgstr "مسح"
+
+msgid "Settings"
+msgstr "الإعدادات"
+
+msgid "Format"
+msgstr "الصيغة"
+
+msgid "Video (MP4)"
+msgstr "فيديو (MP4)"
+
+msgid "Audio Only (MP3)"
+msgstr "صوت فقط (MP3)"
+
+msgid "Quality"
+msgstr "الجودة"
+
+msgid "Best Quality"
+msgstr "أفضل جودة"
+
+msgid "Save Folder"
+msgstr "مجلد الحفظ"
+
+msgid "Theme"
+msgstr "المظهر"
+
+msgid "Dark"
+msgstr "داكن"
+
+msgid "Light"
+msgstr "فاتح"
+
+msgid "System"
+msgstr "النظام"
+
+msgid "Language"
+msgstr "اللغة"
+
+msgid "Download"
+msgstr "تحميل"
+
+msgid "Cancel"
+msgstr "إلغاء"
+
+msgid "Ready"
+msgstr "جاهز"
+
+msgid "Log"
+msgstr "السجلات"
+
+msgid "Warning"
+msgstr "تحذير"
+
+msgid "Please enter a valid URL!"
+msgstr "يرجى إدخال رابط صالح!"
+
+msgid "Connecting..."
+msgstr "جارٍ الاتصال..."
+
+msgid "Downloading..."
+msgstr "جارٍ التحميل..."
+
+msgid "Merging streams (ffmpeg)..."
+msgstr "جارٍ الدمج (ffmpeg)..."
+
+msgid "Merging completed"
+msgstr "اكتمل الدمج"
+
+msgid "Completed"
+msgstr "اكتمل"
+
+msgid "Cancelled"
+msgstr "تم الإلغاء"
+
+msgid "Cancellation requested..."
+msgstr "تم طلب الإلغاء..."
+
+msgid "Error occurred"
+msgstr "حدث خطأ"
+
+msgid "Error: "
+msgstr "خطأ: "
+
+msgid "Analyzing URL: "
+msgstr "جارٍ تحليل الرابط: "
+
+msgid "Download completed! Location: "
+msgstr "اكتمل التحميل! الموقع: "
+
+msgid "Downloaded: "
+msgstr "تم التحميل: "
+
+msgid "aria2 accelerated"
+msgstr "تم التسريع بواسطة aria2"
+
+msgid "History"
+msgstr "السجل"
+
+msgid "Clear History"
+msgstr "مسح السجل"
+
+msgid "Default Quality"
+msgstr "الجودة الافتراضية"
+
+msgid "Default Save Folder"
+msgstr "المجلد الافتراضي"
+
+msgid "Disable Telemetry (Privacy Mode)"
+msgstr "تعطيل القياس عن بعد (وضع الخصوصية)"
+
+msgid "Update Available"
+msgstr "تحديث متوفر"
+
+msgid "New Version Available"
+msgstr "نسخة جديدة متوفرة"
+
+msgid "Cloud Sync / Storage"
+msgstr "المزامنة السحابية"
+
+msgid "Google Drive API Key"
+msgstr "مفتاح Google Drive API"
+
+msgid "OneDrive API Key"
+msgstr "مفتاح OneDrive API"
+
+msgid "Save Settings"
+msgstr "حفظ الإعدادات"
+
+msgid "Settings saved successfully!"
+msgstr "تم حفظ الإعدادات بنجاح!"
+
+msgid "No downloads yet."
+msgstr "لا توجد تنزيلات حتى الآن."
+
+msgid "Delete"
+msgstr "حذف"
+
+msgid "Open Folder"
+msgstr "فتح المجلد"
+
+msgid "Notifications"
+msgstr "الإشعارات"
+

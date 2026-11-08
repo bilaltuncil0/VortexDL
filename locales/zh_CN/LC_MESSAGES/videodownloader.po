@@ -1,0 +1,164 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: VortexDL 3.0.0\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_CN\n"
+
+msgid "VortexDL"
+msgstr "VortexDL"
+
+msgid "Video URL"
+msgstr "视频链接"
+
+msgid "Paste URL here (YouTube, Instagram, TikTok, Twitter...)"
+msgstr "在此粘贴链接 (YouTube, Instagram, TikTok, Twitter...)"
+
+msgid "Paste"
+msgstr "粘贴"
+
+msgid "Clear"
+msgstr "清除"
+
+msgid "Settings"
+msgstr "设置"
+
+msgid "Format"
+msgstr "格式"
+
+msgid "Video (MP4)"
+msgstr "视频 (MP4)"
+
+msgid "Audio Only (MP3)"
+msgstr "仅音频 (MP3)"
+
+msgid "Quality"
+msgstr "清晰度"
+
+msgid "Best Quality"
+msgstr "最高画质"
+
+msgid "Save Folder"
+msgstr "保存文件夹"
+
+msgid "Theme"
+msgstr "主题"
+
+msgid "Dark"
+msgstr "暗黑"
+
+msgid "Light"
+msgstr "明亮"
+
+msgid "System"
+msgstr "跟随系统"
+
+msgid "Language"
+msgstr "语言"
+
+msgid "Download"
+msgstr "下载"
+
+msgid "Cancel"
+msgstr "取消"
+
+msgid "Ready"
+msgstr "就绪"
+
+msgid "Log"
+msgstr "日志"
+
+msgid "Warning"
+msgstr "警告"
+
+msgid "Please enter a valid URL!"
+msgstr "请输入有效的链接！"
+
+msgid "Connecting..."
+msgstr "连接中..."
+
+msgid "Downloading..."
+msgstr "正在下载..."
+
+msgid "Merging streams (ffmpeg)..."
+msgstr "正在合并音视频 (ffmpeg)..."
+
+msgid "Merging completed"
+msgstr "合并完成"
+
+msgid "Completed"
+msgstr "已完成"
+
+msgid "Cancelled"
+msgstr "已取消"
+
+msgid "Cancellation requested..."
+msgstr "已请求取消..."
+
+msgid "Error occurred"
+msgstr "发生错误"
+
+msgid "Error: "
+msgstr "错误: "
+
+msgid "Analyzing URL: "
+msgstr "正在分析链接: "
+
+msgid "Download completed! Location: "
+msgstr "下载完成！保存位置: "
+
+msgid "Downloaded: "
+msgstr "已下载: "
+
+msgid "aria2 accelerated"
+msgstr "已启用 aria2 加速"
+
+msgid "History"
+msgstr "下载历史"
+
+msgid "Clear History"
+msgstr "清除历史"
+
+msgid "Default Quality"
+msgstr "默认清晰度"
+
+msgid "Default Save Folder"
+msgstr "默认保存路径"
+
+msgid "Disable Telemetry (Privacy Mode)"
+msgstr "关闭遥测 (隐私模式)"
+
+msgid "Update Available"
+msgstr "有可用更新"
+
+msgid "New Version Available"
+msgstr "发现新版本可供下载"
+
+msgid "Cloud Sync / Storage"
+msgstr "云存储与同步"
+
+msgid "Google Drive API Key"
+msgstr "Google Drive API 密钥"
+
+msgid "OneDrive API Key"
+msgstr "OneDrive API 密钥"
+
+msgid "Save Settings"
+msgstr "保存设置"
+
+msgid "Settings saved successfully!"
+msgstr "设置已成功保存！"
+
+msgid "No downloads yet."
+msgstr "暂无下载记录。"
+
+msgid "Delete"
+msgstr "删除"
+
+msgid "Open Folder"
+msgstr "打开文件夹"
+
+msgid "Notifications"
+msgstr "通知"
+

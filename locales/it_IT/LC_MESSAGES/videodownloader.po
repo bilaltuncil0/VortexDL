@@ -1,0 +1,164 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: VortexDL 3.0.0\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: it_IT\n"
+
+msgid "VortexDL"
+msgstr "VortexDL"
+
+msgid "Video URL"
+msgstr "URL Video"
+
+msgid "Paste URL here (YouTube, Instagram, TikTok, Twitter...)"
+msgstr "Incolla l'URL qui (YouTube, Instagram, TikTok, Twitter...)"
+
+msgid "Paste"
+msgstr "Incolla"
+
+msgid "Clear"
+msgstr "Cancella"
+
+msgid "Settings"
+msgstr "Impostazioni"
+
+msgid "Format"
+msgstr "Formato"
+
+msgid "Video (MP4)"
+msgstr "Video (MP4)"
+
+msgid "Audio Only (MP3)"
+msgstr "Solo Audio (MP3)"
+
+msgid "Quality"
+msgstr "Qualità"
+
+msgid "Best Quality"
+msgstr "Migliore Qualità"
+
+msgid "Save Folder"
+msgstr "Cartella di salvataggio"
+
+msgid "Theme"
+msgstr "Tema"
+
+msgid "Dark"
+msgstr "Scuro"
+
+msgid "Light"
+msgstr "Chiaro"
+
+msgid "System"
+msgstr "Sistema"
+
+msgid "Language"
+msgstr "Lingua"
+
+msgid "Download"
+msgstr "Scarica"
+
+msgid "Cancel"
+msgstr "Annulla"
+
+msgid "Ready"
+msgstr "Pronto"
+
+msgid "Log"
+msgstr "Registri"
+
+msgid "Warning"
+msgstr "Avviso"
+
+msgid "Please enter a valid URL!"
+msgstr "Inserisci un URL valido!"
+
+msgid "Connecting..."
+msgstr "Connessione in corso..."
+
+msgid "Downloading..."
+msgstr "Download in corso..."
+
+msgid "Merging streams (ffmpeg)..."
+msgstr "Unione tracce (ffmpeg)..."
+
+msgid "Merging completed"
+msgstr "Unione completata"
+
+msgid "Completed"
+msgstr "Completato"
+
+msgid "Cancelled"
+msgstr "Annullato"
+
+msgid "Cancellation requested..."
+msgstr "Richiesta annullamento..."
+
+msgid "Error occurred"
+msgstr "Si è verificato un errore"
+
+msgid "Error: "
+msgstr "Errore: "
+
+msgid "Analyzing URL: "
+msgstr "Analisi URL: "
+
+msgid "Download completed! Location: "
+msgstr "Download completato! Posizione: "
+
+msgid "Downloaded: "
+msgstr "Scaricato: "
+
+msgid "aria2 accelerated"
+msgstr "Accelerato da aria2"
+
+msgid "History"
+msgstr "Cronologia"
+
+msgid "Clear History"
+msgstr "Cancella cronologia"
+
+msgid "Default Quality"
+msgstr "Qualità predefinita"
+
+msgid "Default Save Folder"
+msgstr "Cartella predefinita"
+
+msgid "Disable Telemetry (Privacy Mode)"
+msgstr "Disattiva telemetria (Modalità Privacy)"
+
+msgid "Update Available"
+msgstr "Aggiornamento disponibile"
+
+msgid "New Version Available"
+msgstr "Nuova versione disponibile"
+
+msgid "Cloud Sync / Storage"
+msgstr "Sincronizzazione Cloud"
+
+msgid "Google Drive API Key"
+msgstr "Chiave API Google Drive"
+
+msgid "OneDrive API Key"
+msgstr "Chiave API OneDrive"
+
+msgid "Save Settings"
+msgstr "Salva impostazioni"
+
+msgid "Settings saved successfully!"
+msgstr "Impostazioni salvate con successo!"
+
+msgid "No downloads yet."
+msgstr "Nessun download presente."
+
+msgid "Delete"
+msgstr "Elimina"
+
+msgid "Open Folder"
+msgstr "Apri cartella"
+
+msgid "Notifications"
+msgstr "Notifiche"
+

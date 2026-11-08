@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=VortexDL
+GenericName=Video & Audio Downloader
+Comment=Next-Gen Premium Video Downloader powered by yt-dlp & aria2c
+Exec=/home/bilal/.gemini/antigravity/scratch/VideoDownloader/dist/VortexDL
+Icon=/home/bilal/.gemini/antigravity/scratch/VideoDownloader/assets/icon.png
+Terminal=false
+StartupNotify=true
+Categories=AudioVideo;Network;
+Keywords=video;download;youtube;instagram;tiktok;yt-dlp;vortex;
+MimeType=x-scheme-handler/vortexdl;
