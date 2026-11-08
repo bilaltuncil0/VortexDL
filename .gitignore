@@ -1,0 +1,81 @@
+# =============================================================
+#  VideoDownloader — .gitignore
+#  Generated for Python + CustomTkinter + yt-dlp project
+# =============================================================
+
+# ── Python cache & bytecode ───────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+
+# ── Virtual environments ──────────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+.env/
+.ENV/
+
+# ── PyInstaller build output ──────────────────────────────────
+build/
+dist/
+*.spec
+!build_linux.spec          # keep our custom spec if it exists
+
+# ── AppImage build artifacts ──────────────────────────────────
+AppDir/
+*.AppImage
+squashfs-root/
+appimagetool*
+linuxdeploy*
+
+# ── Downloaded media (temp files from yt-dlp) ────────────────
+*.mp4
+*.mkv
+*.webm
+*.mp3
+*.m4a
+*.opus
+*.f*                       # e.g. .f137 .f140 partial streams
+*.part
+*.ytdl
+*.temp
+*.tmp
+
+# ── Logs ──────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── IDE / editor ──────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# ── OS ────────────────────────────────────────────────────────
+Thumbs.db
+desktop.ini
+.Spotlight-V100
+.Trashes
+
+# ── Packaging / distribution ──────────────────────────────────
+*.egg-info/
+*.egg
+*.whl
+MANIFEST
+.eggs/
+
+# ── Testing ───────────────────────────────────────────────────
+.pytest_cache/
+.tox/
+htmlcov/
+.coverage
+coverage.xml
+
+# ── Secrets / local config ────────────────────────────────────
+.env.local
+*.cookies
+cookies.txt

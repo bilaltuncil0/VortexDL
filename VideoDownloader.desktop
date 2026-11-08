@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=VideoDownloader
+Comment=yt-dlp tabanlı modern video indirme uygulaması
+Exec=python3 /home/bilal/.gemini/antigravity/scratch/VideoDownloader/downloader.py
+Icon=video-x-generic
+Terminal=false
+Categories=AudioVideo;Network;
+Keywords=video;download;youtube;instagram;tiktok;
