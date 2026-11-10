@@ -19,6 +19,7 @@ import queue
 
 from vortexdl.core.models import DownloadStatus
 from vortexdl.services.download_service import DownloadQueueService
+from vortexdl.ui.queue_view import QueueView
 
 from storage import load_settings, save_settings
 from vortexdl.storage.database import (
@@ -117,7 +118,7 @@ def strip_ansi(text: str) -> str:
 class VortexDLApp(ctk.CTk):
     def __init__(self):
         super().__init__()
-        self.download_service = DownloadQueueService()
+        self.download_service = DownloadQueueService(max_workers=3)
         self._active_task_id = None
         self._closing = False
 
@@ -346,47 +347,61 @@ class VortexDLApp(ctk.CTk):
             fg_color=COLORS["bg_card"], hover_color=COLORS["accent_purple"], command=self._choose_dir
         ).pack(side="right")
 
-        # 3. Action / Progress Card
-        prog_card = self._create_card(self.main_container, f"⚡  {_('Download')}")
-        prog_inner = ctk.CTkFrame(prog_card, fg_color="transparent")
-        prog_inner.pack(fill="x", padx=18, pady=(4, 12))
+        # 3. Concurrent download queue
+        queue_card = self._create_card(
+            self.main_container, f"📥  {_('Download Queue')}", expand=True
+        )
+        queue_inner = ctk.CTkFrame(queue_card, fg_color="transparent")
+        queue_inner.pack(fill="both", expand=True, padx=18, pady=(4, 10))
 
         self.download_btn = ctk.CTkButton(
-            prog_inner, text=f"⬇  {_('Download')}", height=46, corner_radius=23,
-            font=ctk.CTkFont(size=15, weight="bold"),
+            queue_inner, text=f"⬇  {_('Download')}", height=42, corner_radius=21,
+            font=ctk.CTkFont(size=14, weight="bold"),
             fg_color=COLORS["accent_purple"], hover_color=COLORS["accent"],
             text_color="#ffffff", command=self._start_download
         )
-        self.download_btn.pack(fill="x", pady=(0, 10))
-
-        bar_row = ctk.CTkFrame(prog_inner, fg_color="transparent")
-        bar_row.pack(fill="x")
-
-        self.progress_bar = ctk.CTkProgressBar(
-            bar_row, mode="determinate", height=16, corner_radius=8,
-            progress_color=COLORS["accent"], fg_color=COLORS["bg_primary"]
-        )
-        self.progress_bar.pack(side="left", fill="x", expand=True, padx=(0, 12))
-        self.progress_bar.set(0)
-
-        self.percent_label = ctk.CTkLabel(
-            bar_row, text="0%", width=50,
-            font=ctk.CTkFont(size=13, weight="bold"), text_color=COLORS["accent"]
-        )
-        self.percent_label.pack(side="right")
+        self.download_btn.pack(fill="x", pady=(0, 8))
 
         self.status_label = ctk.CTkLabel(
-            prog_inner, text=_("Ready"), font=ctk.CTkFont(size=12),
+            queue_inner, text=_("Ready"), font=ctk.CTkFont(size=11),
             text_color=COLORS["text_muted"], anchor="w"
         )
-        self.status_label.pack(fill="x", pady=(6, 0))
+        self.status_label.pack(fill="x", pady=(0, 6))
+
+        self.queue_view = QueueView(
+            queue_inner, colors=COLORS, translate=_,
+            on_cancel=self._cancel_task,
+            on_pause=self._pause_task,
+            on_resume=self._resume_task,
+            on_show_folder=self._open_file_folder,
+            height=250,
+        )
+        self.queue_view.pack(fill="both", expand=True, pady=(0, 8))
+        for task in self.download_service.list_tasks():
+            self.queue_view.upsert(task)
+
+        summary = ctk.CTkFrame(
+            queue_inner, fg_color=COLORS["bg_card"], corner_radius=10
+        )
+        summary.pack(fill="x")
+        self.active_count_label = ctk.CTkLabel(
+            summary, text="", anchor="w", font=ctk.CTkFont(size=11),
+            text_color=COLORS["text_muted"],
+        )
+        self.active_count_label.pack(side="left", padx=12, pady=7)
+        self.bandwidth_label = ctk.CTkLabel(
+            summary, text="", anchor="e", font=ctk.CTkFont(size=11, weight="bold"),
+            text_color=COLORS["accent"],
+        )
+        self.bandwidth_label.pack(side="right", padx=12, pady=7)
+        self._update_queue_summary()
 
         # 4. Logs Box (Collapsible / Clean)
-        log_card = self._create_card(self.main_container, f"📋  {_('Log')}", expand=True)
+        log_card = self._create_card(self.main_container, f"📋  {_('Log')}", expand=False)
         self.log_box = ctk.CTkTextbox(
             log_card, font=ctk.CTkFont(family="Monospace", size=11),
             fg_color=COLORS["bg_primary"], text_color=COLORS["text_muted"],
-            wrap="word", state="disabled", corner_radius=12
+            wrap="word", state="disabled", corner_radius=12, height=90
         )
         self.log_box.pack(fill="both", expand=True, padx=18, pady=(4, 12))
 
@@ -654,51 +669,32 @@ class VortexDLApp(ctk.CTk):
             self.log_box.delete("1.0", "end")
             self.log_box.configure(state="disabled")
 
-    def _set_progress(self, val: float, pct_text: str, status: str):
-        self.after(0, self._update_prog, val, pct_text, status)
+    def _update_queue_summary(self):
+        active = self.download_service.active_count
+        speed = self.download_service.total_bandwidth_mib
+        count_label = getattr(self, "active_count_label", None)
+        speed_label = getattr(self, "bandwidth_label", None)
+        if count_label is not None and count_label.winfo_exists():
+            count_label.configure(text=f"{_('Active downloads')}: {active}")
+        if speed_label is not None and speed_label.winfo_exists():
+            speed_label.configure(text=f"{_('Total speed')}: {speed:.2f} MiB/s")
 
-    def _update_prog(self, val: float, pct_text: str, status: str):
-        if hasattr(self, "progress_bar") and self.progress_bar.winfo_exists():
-            self.progress_bar.set(val)
-            self.percent_label.configure(text=pct_text)
-            self.status_label.configure(text=status)
+    def _set_queue_status(self, text, color=None):
+        label = getattr(self, "status_label", None)
+        if label is not None and label.winfo_exists():
+            label.configure(text=text)
+            if color:
+                label.configure(text_color=color)
 
-    def _set_downloading_state(self, is_down: bool):
-        self._is_downloading = is_down
-        self.after(0, self._toggle_dl_btn, is_down)
-
-    def _toggle_dl_btn(self, is_down: bool):
-        if hasattr(self, "download_btn") and self.download_btn.winfo_exists():
-            if is_down:
-                self.download_btn.configure(
-                    text=f"⏹  {_('Cancel')}", fg_color=COLORS["danger"],
-                    hover_color="#990000", command=self._cancel_download
-                )
-            else:
-                self.download_btn.configure(
-                    text=f"⬇  {_('Download')}", fg_color=COLORS["accent_purple"],
-                    hover_color=COLORS["accent"], command=self._start_download
-                )
-
-    def _cancel_download(self):
-        if self._active_task_id:
-            self.download_service.cancel(self._active_task_id)
+    def _cancel_task(self, task_id):
+        if self.download_service.cancel(task_id):
             self._log(f"⚠  {_('Cancellation requested...')}")
 
-    def _build_format_string(self) -> str:
-        fmt = self.format_var.get()
-        qual = self.quality_var.get()
-        if fmt in [_("Audio Only (MP3)"), "Audio Only (MP3)", "Sadece Ses (MP3)"]:
-            return "bestaudio/best"
-        q_map = {
-            _("Best Quality"): "bestvideo+bestaudio/best",
-            "Best Quality": "bestvideo+bestaudio/best",
-            "1080p": "bestvideo[height<=1080]+bestaudio/best[height<=1080]/best",
-            "720p":  "bestvideo[height<=720]+bestaudio/best[height<=720]/best",
-            "480p":  "bestvideo[height<=480]+bestaudio/best[height<=480]/best",
-            "360p":  "bestvideo[height<=360]+bestaudio/best[height<=360]/best",
-        }
-        return q_map.get(qual, "bestvideo+bestaudio/best")
+    def _pause_task(self, task_id):
+        self.download_service.pause(task_id)
+
+    def _resume_task(self, task_id):
+        self.download_service.resume(task_id)
 
     def _start_download(self):
         url = self.url_entry.get().strip()
@@ -722,52 +718,41 @@ class VortexDLApp(ctk.CTk):
         except (ValueError, RuntimeError) as exc:
             messagebox.showerror(_("Error occurred"), str(exc))
             return
-        self._active_task_id = task.task_id
-        self._clear_log()
-        self._set_downloading_state(True)
-        self._set_progress(0, "0%", _("Connecting..."))
-        self.status_label.configure(text_color=COLORS["text_muted"])
+        self.url_entry.delete(0, "end")
+        if hasattr(self, "queue_view") and self.queue_view.winfo_exists():
+            self.queue_view.upsert(task)
+        self._set_queue_status(_("Waiting"), COLORS["warning"])
+        self._update_queue_summary()
         self._log(f"🔍 {_('Analyzing URL: ')}{url}")
 
     def _drain_download_events(self):
         if self._closing:
             return
-        changed = False
         try:
             while True:
                 event = self.download_service.events.get_nowait()
-                changed = True
-                if event.message:
+                if event.message and event.kind != "progress":
                     self._log(event.message)
-                if event.kind == "progress":
-                    pct = max(0.0, min(100.0, event.progress))
-                    self._set_progress(
-                        pct / 100.0,
-                        f"{pct:.1f}%",
-                        f"{_('Downloading...')} {pct:.1f}%  |  {event.speed}".strip(),
-                    )
-                elif event.status == DownloadStatus.QUEUED:
-                    self._set_progress(0, "0%", _("Connecting..."))
+                task = self.download_service.get_task(event.task_id)
+                queue_view = getattr(self, "queue_view", None)
+                if task is not None and queue_view is not None and queue_view.winfo_exists():
+                    queue_view.upsert(task)
+                if event.status == DownloadStatus.QUEUED:
+                    self._set_queue_status(_("Waiting"), COLORS["warning"])
+                elif event.status == DownloadStatus.DOWNLOADING:
+                    self._set_queue_status(_("Downloading..."), COLORS["accent"])
+                elif event.status == DownloadStatus.PAUSED:
+                    self._set_queue_status(_("Paused"), COLORS["warning"])
                 elif event.status == DownloadStatus.COMPLETED:
-                    self._set_progress(1, "100%", f"✅ {_('Completed')}")
-                    self._set_downloading_state(False)
-                    self._set_status_color(COLORS["success"])
+                    self._set_queue_status(_("Completed"), COLORS["success"])
                 elif event.status == DownloadStatus.CANCELLED:
-                    self._set_progress(0, "0%", f"⚠ {_('Cancelled')}")
-                    self._set_downloading_state(False)
-                    self._set_status_color(COLORS["warning"])
+                    self._set_queue_status(_("Cancelled"), COLORS["warning"])
                 elif event.status == DownloadStatus.FAILED:
-                    self._set_progress(0, "0%", f"❌ {_('Error occurred')}")
-                    self._set_downloading_state(False)
-                    self._set_status_color(COLORS["danger"])
+                    self._set_queue_status(_("Error occurred"), COLORS["danger"])
+                self._update_queue_summary()
         except queue.Empty:
             pass
         self.after(100, self._drain_download_events)
-
-    def _set_status_color(self, color):
-        label = getattr(self, "status_label", None)
-        if label is not None and label.winfo_exists():
-            label.configure(text_color=color)
 
     def _on_close(self):
         self._closing = True

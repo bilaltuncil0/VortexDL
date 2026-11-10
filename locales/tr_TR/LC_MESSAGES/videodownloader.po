@@ -162,3 +162,24 @@ msgstr "Klasörü Aç"
 msgid "Notifications"
 msgstr "Bildirimler"
 
+
+msgid "Download Queue"
+msgstr "İndirme Kuyruğu"
+
+msgid "Waiting"
+msgstr "Bekliyor"
+
+msgid "Paused"
+msgstr "Duraklatıldı"
+
+msgid "Pause"
+msgstr "Duraklat"
+
+msgid "Resume"
+msgstr "Sürdür"
+
+msgid "Active downloads"
+msgstr "Aktif indirmeler"
+
+msgid "Total speed"
+msgstr "Toplam hız"

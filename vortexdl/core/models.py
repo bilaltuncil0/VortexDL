@@ -1,4 +1,4 @@
-"""Small domain models shared by the UI and background services."""
+"""Domain models for queued downloads and UI events."""
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
@@ -8,6 +8,7 @@ from uuid import uuid4
 class DownloadStatus(str, Enum):
     QUEUED = "queued"
     DOWNLOADING = "downloading"
+    PAUSED = "paused"
     COMPLETED = "completed"
     FAILED = "failed"
     CANCELLED = "cancelled"
@@ -15,7 +16,7 @@ class DownloadStatus(str, Enum):
 
 @dataclass
 class DownloadTask:
-    """One video or audio download and its observable state."""
+    """One queued media download and its observable state."""
     url: str
     quality: str = "best"
     output_dir: str = ""
@@ -23,6 +24,8 @@ class DownloadTask:
     task_id: str = field(default_factory=lambda: str(uuid4()))
     title: str = ""
     speed: str = ""
+    speed_mib: float = 0.0
+    eta: str = ""
     progress: float = 0.0
     status: DownloadStatus = DownloadStatus.QUEUED
     output_path: str = ""
@@ -32,11 +35,14 @@ class DownloadTask:
 
 @dataclass(frozen=True)
 class DownloadEvent:
-    """Thread-safe message sent from a worker to the Tk main loop."""
+    """Immutable worker-to-UI event; every update is keyed by task_id."""
     task_id: str
     kind: str
     status: DownloadStatus
     progress: float = 0.0
     speed: str = ""
+    speed_mib: float = 0.0
+    eta: str = ""
+    title: str = ""
     message: str = ""
     output_path: str = ""

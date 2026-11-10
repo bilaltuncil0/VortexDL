@@ -5,11 +5,13 @@ on:
     branches:
       - main
       - feature/modular-download-architecture
+      - feature/queue-ui-multitask
     tags:
       - 'v*'
   pull_request:
     branches:
       - main
+      - feature/modular-download-architecture
   workflow_dispatch:
 
 permissions:

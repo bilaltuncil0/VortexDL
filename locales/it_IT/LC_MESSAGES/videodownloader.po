@@ -162,3 +162,24 @@ msgstr "Apri cartella"
 msgid "Notifications"
 msgstr "Notifiche"
 
+
+msgid "Download Queue"
+msgstr "Coda download"
+
+msgid "Waiting"
+msgstr "In attesa"
+
+msgid "Paused"
+msgstr "In pausa"
+
+msgid "Pause"
+msgstr "Pausa"
+
+msgid "Resume"
+msgstr "Riprendi"
+
+msgid "Active downloads"
+msgstr "Download attivi"
+
+msgid "Total speed"
+msgstr "Velocità totale"

@@ -162,3 +162,24 @@ msgstr "فتح المجلد"
 msgid "Notifications"
 msgstr "الإشعارات"
 
+
+msgid "Download Queue"
+msgstr "قائمة التنزيلات"
+
+msgid "Waiting"
+msgstr "قيد الانتظار"
+
+msgid "Paused"
+msgstr "متوقف مؤقتًا"
+
+msgid "Pause"
+msgstr "إيقاف مؤقت"
+
+msgid "Resume"
+msgstr "استئناف"
+
+msgid "Active downloads"
+msgstr "التنزيلات النشطة"
+
+msgid "Total speed"
+msgstr "السرعة الإجمالية"
