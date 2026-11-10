@@ -228,3 +228,12 @@ msgstr "已加入队列："
 
 msgid "Audio (MP3)"
 msgstr "音频 (MP3)"
+
+msgid "Speed Limit"
+msgstr "速度限制"
+
+msgid "Unlimited"
+msgstr "不限速"
+
+msgid "Speed limit updated to: "
+msgstr "速度限制已更新为："

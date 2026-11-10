@@ -228,3 +228,12 @@ msgstr "Aggiunto alla coda:"
 
 msgid "Audio (MP3)"
 msgstr "Audio (MP3)"
+
+msgid "Speed Limit"
+msgstr "Limite di velocità"
+
+msgid "Unlimited"
+msgstr "Illimitata"
+
+msgid "Speed limit updated to: "
+msgstr "Limite di velocità aggiornata a: "

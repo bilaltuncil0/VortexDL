@@ -228,3 +228,12 @@ msgstr "Ajouté à la file :"
 
 msgid "Audio (MP3)"
 msgstr "Audio (MP3)"
+
+msgid "Speed Limit"
+msgstr "Limite de vitesse"
+
+msgid "Unlimited"
+msgstr "Illimitée"
+
+msgid "Speed limit updated to: "
+msgstr "Limite de vitesse mise à jour : "

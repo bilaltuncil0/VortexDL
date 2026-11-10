@@ -31,9 +31,73 @@ _SPEED_FACTORS = {
 }
 
 
+def _normalize_speed_limit(value):
+    try:
+        return max(0, int(value or 0))
+    except (TypeError, ValueError, OverflowError):
+        return 0
+
+
+class _SharedRateLimiter:
+    """A thread-safe token bucket that caps aggregate traffic across workers."""
+
+    def __init__(self, bytes_per_second=0):
+        self._condition = threading.Condition()
+        self._rate = _normalize_speed_limit(bytes_per_second)
+        self._tokens = float(self._rate)
+        self._updated_at = time.monotonic()
+        self._last_bytes = {}
+
+    def set_limit(self, bytes_per_second):
+        with self._condition:
+            self._rate = max(0, int(bytes_per_second or 0))
+            self._tokens = min(self._tokens, float(self._rate))
+            self._updated_at = time.monotonic()
+            self._condition.notify_all()
+
+    def forget(self, task_id):
+        with self._condition:
+            self._last_bytes.pop(task_id, None)
+
+    def consume(self, task_id, total_bytes, cancel_event, pause_event):
+        """Wait until newly received bytes fit the current shared rate budget."""
+        total_bytes = max(0, int(total_bytes or 0))
+        with self._condition:
+            previous = self._last_bytes.get(task_id, 0)
+            self._last_bytes[task_id] = total_bytes
+            remaining = max(0, total_bytes - previous)
+
+        while remaining > 0:
+            if cancel_event.is_set():
+                raise DownloadCancelled("İndirme iptal edildi.")
+            while pause_event.is_set():
+                if cancel_event.wait(0.1):
+                    raise DownloadCancelled("İndirme iptal edildi.")
+                if not pause_event.is_set():
+                    break
+                time.sleep(0.1)
+
+            with self._condition:
+                now = time.monotonic()
+                if not self._rate:
+                    self._updated_at = now
+                    return
+                elapsed = max(0.0, now - self._updated_at)
+                self._tokens = min(
+                    float(self._rate), self._tokens + elapsed * self._rate
+                )
+                self._updated_at = now
+                amount = min(remaining, self._tokens)
+                self._tokens -= amount
+                remaining -= int(amount)
+                if remaining > 0:
+                    wait_for = min(0.25, remaining / self._rate)
+                    self._condition.wait(timeout=max(0.01, wait_for))
+
+
 class DownloadQueueService:
     """Tracks tasks and runs up to max_workers downloads concurrently."""
-    def __init__(self, events: Optional[queue.Queue] = None, max_workers: int = 3):
+    def __init__(self, events: Optional[queue.Queue] = None, max_workers: int = 3, global_speed_limit: int = 0):
         self.events = events if events is not None else queue.Queue()
         self.max_workers = max(1, int(max_workers))
         self._tasks = {}
@@ -42,9 +106,28 @@ class DownloadQueueService:
         self._futures: dict[str, Future] = {}
         self._lock = threading.RLock()
         self._closed = False
+        self._global_speed_limit = _normalize_speed_limit(global_speed_limit)
+        self._active_ydl_params = {}
+        self._rate_limiter = _SharedRateLimiter(self._global_speed_limit)
         self._executor = ThreadPoolExecutor(
             max_workers=self.max_workers, thread_name_prefix="vortexdl-download"
         )
+
+    @property
+    def global_speed_limit(self) -> int:
+        with self._lock:
+            return self._global_speed_limit
+
+    def set_global_speed_limit(self, bytes_per_second: int) -> None:
+        """Update the aggregate limit immediately for active and future tasks."""
+        limit = _normalize_speed_limit(bytes_per_second)
+        with self._lock:
+            self._global_speed_limit = limit
+            # yt-dlp downloader instances share this params mapping; updating it
+            # changes the ratelimit used by already-running downloads as well.
+            for params in self._active_ydl_params.values():
+                params["ratelimit"] = limit or None
+        self._rate_limiter.set_limit(limit)
 
     def add(self, url: str, quality: str = "best", output_dir: str = "", media_format: str = "video", title: str = "") -> DownloadTask:
         url = (url or "").strip()
@@ -196,6 +279,11 @@ class DownloadQueueService:
 
             def progress_hook(data):
                 self._wait_if_paused(task_id, cancel_event, pause_event)
+                downloaded_bytes = data.get("downloaded_bytes")
+                if downloaded_bytes is not None:
+                    self._rate_limiter.consume(
+                        task_id, downloaded_bytes, cancel_event, pause_event
+                    )
                 if data.get("status") != "downloading":
                     return
                 raw_percent = str(data.get("_percent_str", "0%")).replace("%", "").strip()
@@ -226,6 +314,9 @@ class DownloadQueueService:
                 "quiet": True,
                 "no_warnings": False,
             }
+            speed_limit = self.global_speed_limit
+            if speed_limit:
+                options["ratelimit"] = speed_limit
             if task.media_format == "audio":
                 options["postprocessors"] = [{
                     "key": "FFmpegExtractAudio", "preferredcodec": "mp3", "preferredquality": "320"
@@ -236,8 +327,14 @@ class DownloadQueueService:
                 options["external_downloader_args"] = {"default": ["-x", "8", "-s", "8", "-k", "1M"]}
 
             with yt_dlp.YoutubeDL(options) as ydl:
-                info = ydl.extract_info(task.url, download=True)
-                output_path = ydl.prepare_filename(info)
+                with self._lock:
+                    self._active_ydl_params[task_id] = ydl.params
+                try:
+                    info = ydl.extract_info(task.url, download=True)
+                    output_path = ydl.prepare_filename(info)
+                finally:
+                    with self._lock:
+                        self._active_ydl_params.pop(task_id, None)
             if task.media_format == "audio":
                 output_path = str(Path(output_path).with_suffix(".mp3"))
             self._wait_if_paused(task_id, cancel_event, pause_event)
@@ -274,6 +371,10 @@ class DownloadQueueService:
             self._mark_failed(task_id, error)
         except Exception as exc:
             self._mark_failed(task_id, DownloadError(f"Beklenmeyen indirme hatası: {exc}"), repr(exc))
+        finally:
+            with self._lock:
+                self._active_ydl_params.pop(task_id, None)
+            self._rate_limiter.forget(task_id)
 
     def _mark_failed(self, task_id: str, error: Exception, detail: str = "") -> None:
         self._change(

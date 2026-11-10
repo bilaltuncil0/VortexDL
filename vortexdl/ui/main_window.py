@@ -120,7 +120,11 @@ def strip_ansi(text: str) -> str:
 class VortexDLApp(ctk.CTk):
     def __init__(self):
         super().__init__()
-        self.download_service = DownloadQueueService(max_workers=3)
+        self.settings = USER_SETTINGS
+        self.download_service = DownloadQueueService(
+            max_workers=3,
+            global_speed_limit=self.settings.get("global_speed_limit", 0),
+        )
         self.metadata_service = MetadataService()
         self._metadata_request_id = None
         self._pending_metadata_defaults = ("best", "video")
@@ -128,7 +132,6 @@ class VortexDLApp(ctk.CTk):
         self._closing = False
 
         self.current_lang = CURRENT_LANG
-        self.settings = USER_SETTINGS
         self.title("⚡ VortexDL v3.0.0 — Ultimate Video Downloader")
         self.geometry("880x730")
         self.minsize(780, 640)
@@ -399,6 +402,37 @@ class VortexDLApp(ctk.CTk):
             text_color=COLORS["text_muted"],
         )
         self.active_count_label.pack(side="left", padx=12, pady=7)
+        speed_limit_frame = ctk.CTkFrame(summary, fg_color="transparent")
+        speed_limit_frame.pack(side="left", padx=10, pady=4)
+        ctk.CTkLabel(
+            speed_limit_frame, text=_("Speed Limit"),
+            text_color=COLORS["text_muted"], font=ctk.CTkFont(size=11),
+        ).pack(side="left", padx=(0, 6))
+        self._speed_limit_choices = {
+            _("Unlimited"): 0,
+            "512 KB/s": 512 * 1024,
+            "1 MB/s": 1024 * 1024,
+            "2 MB/s": 2 * 1024 * 1024,
+            "5 MB/s": 5 * 1024 * 1024,
+        }
+        saved_limit = self.download_service.global_speed_limit
+        initial_choice = next(
+            (label for label, value in self._speed_limit_choices.items()
+             if value == saved_limit),
+            _("Unlimited"),
+        )
+        self.speed_limit_var = ctk.StringVar(value=initial_choice)
+        self.speed_limit_menu = ctk.CTkOptionMenu(
+            speed_limit_frame,
+            values=list(self._speed_limit_choices),
+            variable=self.speed_limit_var,
+            width=125, height=28, corner_radius=9,
+            fg_color=COLORS["bg_secondary"], button_color=COLORS["bg_secondary"],
+            button_hover_color=COLORS["accent_purple"],
+            font=ctk.CTkFont(size=11),
+            command=self._on_speed_limit_change,
+        )
+        self.speed_limit_menu.pack(side="left")
         self.bandwidth_label = ctk.CTkLabel(
             summary, text="", anchor="e", font=ctk.CTkFont(size=11, weight="bold"),
             text_color=COLORS["accent"],
@@ -678,6 +712,15 @@ class VortexDLApp(ctk.CTk):
             self.log_box.configure(state="normal")
             self.log_box.delete("1.0", "end")
             self.log_box.configure(state="disabled")
+
+    def _on_speed_limit_change(self, selection):
+        limit = self._speed_limit_choices.get(selection)
+        if limit is None:
+            return
+        self.settings["global_speed_limit"] = limit
+        save_settings(self.settings)
+        self.download_service.set_global_speed_limit(limit)
+        self._log(f"⚡ {_('Speed limit updated to: ')}{selection}")
 
     def _update_queue_summary(self):
         active = self.download_service.active_count

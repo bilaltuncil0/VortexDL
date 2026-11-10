@@ -228,3 +228,12 @@ msgstr "Zur Warteschlange hinzugefügt:"
 
 msgid "Audio (MP3)"
 msgstr "Audio (MP3)"
+
+msgid "Speed Limit"
+msgstr "Geschwindigkeitslimit"
+
+msgid "Unlimited"
+msgstr "Unbegrenzt"
+
+msgid "Speed limit updated to: "
+msgstr "Geschwindigkeitslimit geändert auf: "

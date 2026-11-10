@@ -228,3 +228,12 @@ msgstr "Kuyruğa eklendi:"
 
 msgid "Audio (MP3)"
 msgstr "Ses (MP3)"
+
+msgid "Speed Limit"
+msgstr "Hız Sınırı"
+
+msgid "Unlimited"
+msgstr "Limitsiz"
+
+msgid "Speed limit updated to: "
+msgstr "Hız sınırı şu şekilde güncellendi: "

@@ -228,3 +228,12 @@ msgstr "Added to queue:"
 
 msgid "Audio (MP3)"
 msgstr "Audio (MP3)"
+
+msgid "Speed Limit"
+msgstr "Speed Limit"
+
+msgid "Unlimited"
+msgstr "Unlimited"
+
+msgid "Speed limit updated to: "
+msgstr "Speed limit updated to: "
