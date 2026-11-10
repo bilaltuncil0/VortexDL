@@ -228,3 +228,12 @@ msgstr "Zur Warteschlange hinzugefügt:"
 
 msgid "Audio (MP3)"
 msgstr "Audio (MP3)"
+
+msgid "Best Video"
+msgstr "Bestes Video"
+
+msgid "Inspecting connection..."
+msgstr "Verbindung wird geprüft..."
+
+msgid "Inspecting link:"
+msgstr "Zu prüfender Link:"

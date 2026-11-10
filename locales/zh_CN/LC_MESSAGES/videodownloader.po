@@ -228,3 +228,12 @@ msgstr "已加入队列："
 
 msgid "Audio (MP3)"
 msgstr "音频 (MP3)"
+
+msgid "Best Video"
+msgstr "最佳视频"
+
+msgid "Inspecting connection..."
+msgstr "正在检查连接..."
+
+msgid "Inspecting link:"
+msgstr "正在检查链接："

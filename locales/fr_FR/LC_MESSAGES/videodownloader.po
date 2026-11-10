@@ -228,3 +228,12 @@ msgstr "Ajouté à la file :"
 
 msgid "Audio (MP3)"
 msgstr "Audio (MP3)"
+
+msgid "Best Video"
+msgstr "Meilleure vidéo"
+
+msgid "Inspecting connection..."
+msgstr "Analyse de la connexion..."
+
+msgid "Inspecting link:"
+msgstr "Lien analysé :"

@@ -228,3 +228,12 @@ msgstr "تمت الإضافة إلى قائمة الانتظار:"
 
 msgid "Audio (MP3)"
 msgstr "صوت (MP3)"
+
+msgid "Best Video"
+msgstr "أفضل فيديو"
+
+msgid "Inspecting connection..."
+msgstr "جارٍ فحص الاتصال..."
+
+msgid "Inspecting link:"
+msgstr "الرابط قيد الفحص:"

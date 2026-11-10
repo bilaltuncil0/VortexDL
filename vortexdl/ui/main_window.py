@@ -737,8 +737,8 @@ class VortexDLApp(ctk.CTk):
             self.download_btn.configure(
                 state="disabled", text=f"🔎  {_('Loading...')}"
             )
-        self._set_queue_status(_("Loading..."), COLORS["accent"])
-        self._log(f"🔎 {_('Loading preview for: ')}{url}")
+        self._set_queue_status(_("Inspecting connection..."), COLORS["accent"])
+        self._log(f"🔎 {_('Inspecting link: ')}{url}")
 
     def _drain_metadata_results(self):
         if self._closing:
