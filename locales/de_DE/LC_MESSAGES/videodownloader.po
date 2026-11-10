@@ -228,3 +228,18 @@ msgstr "Zur Warteschlange hinzugefügt:"
 
 msgid "Audio (MP3)"
 msgstr "Audio (MP3)"
+
+msgid "Show"
+msgstr "Anzeigen"
+
+msgid "Pause All"
+msgstr "Alle Downloads pausieren"
+
+msgid "Quit"
+msgstr "Beenden"
+
+msgid "Minimize to tray on close"
+msgstr "Beim Schließen in den Infobereich minimieren"
+
+msgid "System tray could not be started; the window remains open."
+msgstr "Systemablage konnte nicht gestartet werden; das Fenster bleibt geöffnet."

@@ -228,3 +228,18 @@ msgstr "Added to queue:"
 
 msgid "Audio (MP3)"
 msgstr "Audio (MP3)"
+
+msgid "Show"
+msgstr "Show"
+
+msgid "Pause All"
+msgstr "Pause All"
+
+msgid "Quit"
+msgstr "Quit"
+
+msgid "Minimize to tray on close"
+msgstr "Minimize to tray on close"
+
+msgid "System tray could not be started; the window remains open."
+msgstr "System tray could not be started; the window remains open."

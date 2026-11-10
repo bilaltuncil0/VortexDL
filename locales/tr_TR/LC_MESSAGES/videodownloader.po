@@ -228,3 +228,18 @@ msgstr "Kuyruğa eklendi:"
 
 msgid "Audio (MP3)"
 msgstr "Ses (MP3)"
+
+msgid "Show"
+msgstr "Göster"
+
+msgid "Pause All"
+msgstr "Tüm İndirmeleri Duraklat"
+
+msgid "Quit"
+msgstr "Çıkış"
+
+msgid "Minimize to tray on close"
+msgstr "Kapatıldığında Sistem Tepsisine Küçült"
+
+msgid "System tray could not be started; the window remains open."
+msgstr "Sistem tepsisi başlatılamadı; pencere açık bırakıldı."

@@ -2,4 +2,5 @@
 customtkinter==6.0.0
 yt-dlp==2026.10.26
 darkdetect==0.8.0
-Pillow>=10.0.0
+Pillow>=10.0.0  # UI and tray icon image handling
+pystray>=0.19.5

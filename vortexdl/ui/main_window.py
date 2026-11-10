@@ -22,6 +22,7 @@ from vortexdl.services.download_service import DownloadQueueService
 from vortexdl.services.metadata_service import MetadataService, VideoMetadata
 from vortexdl.ui.queue_view import QueueView
 from vortexdl.ui.preview_dialog import PreviewDialog
+from vortexdl.ui.tray_manager import TrayManager
 
 from storage import load_settings, save_settings
 from vortexdl.storage.database import (
@@ -126,6 +127,7 @@ class VortexDLApp(ctk.CTk):
         self._pending_metadata_defaults = ("best", "video")
         self._active_task_id = None
         self._closing = False
+        self.tray_manager = TrayManager(ASSETS_DIR, translate=_)
 
         self.current_lang = CURRENT_LANG
         self.settings = USER_SETTINGS
@@ -157,6 +159,9 @@ class VortexDLApp(ctk.CTk):
         self._active_tab = "downloader"
 
         self._build_ui()
+        # Initialize detached tray integration before Tk enters mainloop. This is
+        # required by the macOS backend even when the tray icon starts hidden.
+        self.tray_manager.start()
         self.after(100, self._drain_download_events)
         self.after(100, self._drain_metadata_results)
         self.protocol("WM_DELETE_WINDOW", self._on_close)
@@ -489,7 +494,11 @@ class VortexDLApp(ctk.CTk):
     # VIEW 3: SETTINGS & PRIVACY (Obfuscated JSON)
     # =========================================================================
     def _render_settings_view(self):
-        card = self._create_card(self.main_container, f"⚙️  {_('Settings')} & {_('Theme')}")
+        settings_content = ctk.CTkScrollableFrame(
+            self.main_container, fg_color="transparent"
+        )
+        settings_content.pack(fill="both", expand=True)
+        card = self._create_card(settings_content, f"⚙️  {_('Settings')} & {_('Theme')}")
 
         # Default Quality
         q_frame = ctk.CTkFrame(card, fg_color="transparent")
@@ -523,8 +532,20 @@ class VortexDLApp(ctk.CTk):
             progress_color=COLORS["accent"]
         ).pack(side="left")
 
+        # Close-to-tray preference
+        tray_frame = ctk.CTkFrame(card, fg_color="transparent")
+        tray_frame.pack(fill="x", padx=20, pady=(4, 12))
+        self.minimize_to_tray_var = ctk.BooleanVar(
+            value=bool(self.settings.get("minimize_to_tray", True))
+        )
+        ctk.CTkSwitch(
+            tray_frame, text=f"🧺  {_('Minimize to tray on close')}",
+            variable=self.minimize_to_tray_var, font=ctk.CTkFont(size=13),
+            progress_color=COLORS["accent"]
+        ).pack(side="left")
+
         # Cloud Sync API Keys (User-Configurable)
-        cloud_card = self._create_card(self.main_container, f"☁️  {_('Cloud Sync / Storage')}")
+        cloud_card = self._create_card(settings_content, f"☁️  {_('Cloud Sync / Storage')}")
         
         g_row = ctk.CTkFrame(cloud_card, fg_color="transparent")
         g_row.pack(fill="x", padx=20, pady=6)
@@ -550,7 +571,7 @@ class VortexDLApp(ctk.CTk):
 
         # Save Button
         ctk.CTkButton(
-            self.main_container, text=f"💾  {_('Save Settings')}", height=44, corner_radius=22,
+            settings_content, text=f"💾  {_('Save Settings')}", height=44, corner_radius=22,
             fg_color=COLORS["accent_purple"], hover_color=COLORS["accent"],
             font=ctk.CTkFont(size=14, weight="bold"), command=self._save_settings_action
         ).pack(fill="x", pady=10)
@@ -601,6 +622,7 @@ class VortexDLApp(ctk.CTk):
         self.settings["disable_telemetry"] = self.telem_var.get()
         self.settings["gdrive_api_key"] = self.gdrive_entry.get().strip()
         self.settings["onedrive_api_key"] = self.onedrive_entry.get().strip()
+        self.settings["minimize_to_tray"] = self.minimize_to_tray_var.get()
         save_settings(self.settings)
 
         global COLORS
@@ -836,7 +858,54 @@ class VortexDLApp(ctk.CTk):
         self.after(100, self._drain_download_events)
 
     def _on_close(self):
+        if self._closing:
+            return
+        if self.settings.get("minimize_to_tray", True):
+            if self.tray_manager.show():
+                self.withdraw()
+                self.after(100, self._drain_tray_events)
+                return
+            # If the tray backend is unavailable, keep the app usable and visible.
+            self._log(_("System tray could not be started; the window remains open."))
+            return
+        self._quit_app()
+
+    def _drain_tray_events(self):
+        if self._closing:
+            return
+        try:
+            while True:
+                event = self.tray_manager.events.get_nowait()
+                action = event[0] if isinstance(event, tuple) else event
+                if action == "show":
+                    self.tray_manager.hide()
+                    self.deiconify()
+                    self.state("normal")
+                    self.lift()
+                    self.focus_force()
+                elif action == "pause_all":
+                    for task in self.download_service.list_tasks():
+                        if task.status == DownloadStatus.DOWNLOADING:
+                            self.download_service.pause(task.task_id)
+                elif action == "quit":
+                    self._quit_app()
+                    return
+                elif action == "error":
+                    self.tray_manager.stop()
+                    self.deiconify()
+                    self.state("normal")
+                    self.lift()
+                    self._log(_("System tray could not be started; the window remains open."))
+        except queue.Empty:
+            pass
+        if self.state() == "withdrawn" and self.tray_manager.is_running:
+            self.after(200, self._drain_tray_events)
+
+    def _quit_app(self):
+        if self._closing:
+            return
         self._closing = True
+        self.tray_manager.stop()
         self.metadata_service.shutdown(wait=False)
         self.download_service.shutdown(wait=False)
         self.destroy()

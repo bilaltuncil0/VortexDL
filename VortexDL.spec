@@ -33,7 +33,7 @@ hiddenimports = [
 hiddenimports += collect_submodules("vortexdl")
 datas += collect_data_files("vortexdl")
 
-for package in ("yt_dlp", "customtkinter"):
+for package in ("yt_dlp", "customtkinter", "pystray"):
     package_datas, package_binaries, package_hiddenimports = collect_all(package)
     datas += package_datas
     binaries += package_binaries
