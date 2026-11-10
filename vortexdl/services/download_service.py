@@ -184,6 +184,8 @@ class DownloadQueueService:
             self._change(task.task_id, "failed", str(error), status=DownloadStatus.FAILED, error=str(error), speed="")
         except DependencyMissingError as exc:
             self._change(task.task_id, "failed", str(exc), status=DownloadStatus.FAILED, error=str(exc), speed="")
+        except DownloadError as exc:
+            self._change(task.task_id, "failed", str(exc), status=DownloadStatus.FAILED, error=str(exc), speed="")
         except yt_dlp.utils.DownloadError as exc:
             message = str(exc)
             network_markers = ("network", "connection", "timed out", "temporary failure", "unable to download")

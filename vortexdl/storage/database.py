@@ -1,5 +1,6 @@
 """SQLite history storage with compatibility for the existing VortexDL database."""
 import sqlite3
+from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -20,13 +21,26 @@ def _connect() -> sqlite3.Connection:
     return conn
 
 
+@contextmanager
+def _connection():
+    conn = _connect()
+    try:
+        yield conn
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
+
 def add_history_entry(task) -> None:
     size = ""
     try:
         size = f"{Path(task.output_path).stat().st_size / (1024 * 1024):.1f} MB" if task.output_path else ""
     except OSError:
         pass
-    with _connect() as conn:
+    with _connection() as conn:
         conn.execute(
             """INSERT INTO history (title, url, format, quality, filepath, filesize, timestamp)
                VALUES (?, ?, ?, ?, ?, ?, ?)""",
@@ -36,7 +50,7 @@ def add_history_entry(task) -> None:
 
 
 def get_history_entries(limit: int = 100):
-    with _connect() as conn:
+    with _connection() as conn:
         return conn.execute(
             """SELECT id, title, url, format, quality, filepath, filesize, timestamp
                FROM history ORDER BY id DESC LIMIT ?""",
@@ -45,10 +59,10 @@ def get_history_entries(limit: int = 100):
 
 
 def clear_all_history() -> None:
-    with _connect() as conn:
+    with _connection() as conn:
         conn.execute("DELETE FROM history")
 
 
 def delete_history_entry(entry_id: int) -> None:
-    with _connect() as conn:
+    with _connection() as conn:
         conn.execute("DELETE FROM history WHERE id = ?", (int(entry_id),))
