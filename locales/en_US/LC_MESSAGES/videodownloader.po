@@ -183,3 +183,6 @@ msgstr "Active downloads"
 
 msgid "Total speed"
 msgstr "Total speed"
+
+msgid "Stop"
+msgstr "Stop"

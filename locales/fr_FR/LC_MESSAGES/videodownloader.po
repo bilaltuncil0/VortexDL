@@ -183,3 +183,6 @@ msgstr "Téléchargements actifs"
 
 msgid "Total speed"
 msgstr "Vitesse totale"
+
+msgid "Stop"
+msgstr "Arrêter"

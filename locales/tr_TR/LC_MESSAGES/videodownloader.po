@@ -183,3 +183,6 @@ msgstr "Aktif indirmeler"
 
 msgid "Total speed"
 msgstr "Toplam hız"
+
+msgid "Stop"
+msgstr "Durdur"

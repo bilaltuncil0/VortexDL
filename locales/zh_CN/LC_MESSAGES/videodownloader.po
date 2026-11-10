@@ -183,3 +183,6 @@ msgstr "活动下载"
 
 msgid "Total speed"
 msgstr "总速度"
+
+msgid "Stop"
+msgstr "停止"

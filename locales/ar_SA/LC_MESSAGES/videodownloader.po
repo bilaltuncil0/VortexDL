@@ -183,3 +183,6 @@ msgstr "التنزيلات النشطة"
 
 msgid "Total speed"
 msgstr "السرعة الإجمالية"
+
+msgid "Stop"
+msgstr "إيقاف"

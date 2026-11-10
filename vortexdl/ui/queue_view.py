@@ -70,7 +70,7 @@ class TaskRow(ctk.CTkFrame):
         )
         self.cancel_button.pack(side="right", padx=(5, 0))
         self.pause_button = ctk.CTkButton(
-            bottom, text=self._("Pause"), width=72, height=26,
+            bottom, text=self._("Stop"), width=72, height=26,
             fg_color=colors["warning"], hover_color=colors["accent_hover"],
             command=lambda: self.on_pause(self.task_id),
         )
@@ -106,7 +106,7 @@ class TaskRow(ctk.CTkFrame):
             self.pause_button.configure(text=self._("Resume"), command=lambda: self.on_resume(self.task_id))
             self.pause_button.pack(side="right", padx=(5, 0))
         elif task.status == DownloadStatus.DOWNLOADING:
-            self.pause_button.configure(text=self._("Pause"), command=lambda: self.on_pause(self.task_id))
+            self.pause_button.configure(text=self._("Stop"), command=lambda: self.on_pause(self.task_id))
             self.pause_button.pack(side="right", padx=(5, 0))
         else:
             self.pause_button.pack_forget()
