@@ -228,3 +228,21 @@ msgstr "Added to queue:"
 
 msgid "Audio (MP3)"
 msgstr "Audio (MP3)"
+
+msgid "Enable Clipboard Monitoring"
+msgstr "Enable Clipboard Monitoring"
+
+msgid "A link was found in the clipboard. Download it?"
+msgstr "A link was found in the clipboard. Download it?"
+
+msgid "Yes"
+msgstr "Yes"
+
+msgid "No"
+msgstr "No"
+
+msgid "Please wait"
+msgstr "Please wait"
+
+msgid "A preview is already loading."
+msgstr "A preview is already loading."

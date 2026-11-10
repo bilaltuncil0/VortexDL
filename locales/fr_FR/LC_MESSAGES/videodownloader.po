@@ -228,3 +228,21 @@ msgstr "Ajouté à la file :"
 
 msgid "Audio (MP3)"
 msgstr "Audio (MP3)"
+
+msgid "Enable Clipboard Monitoring"
+msgstr "Surveiller automatiquement le presse-papiers"
+
+msgid "A link was found in the clipboard. Download it?"
+msgstr "Un lien a été trouvé dans le presse-papiers. Le télécharger ?"
+
+msgid "Yes"
+msgstr "Oui"
+
+msgid "No"
+msgstr "Non"
+
+msgid "Please wait"
+msgstr "Veuillez patienter"
+
+msgid "A preview is already loading."
+msgstr "Un aperçu est déjà en cours de chargement."

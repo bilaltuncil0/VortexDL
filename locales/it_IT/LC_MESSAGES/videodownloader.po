@@ -228,3 +228,21 @@ msgstr "Aggiunto alla coda:"
 
 msgid "Audio (MP3)"
 msgstr "Audio (MP3)"
+
+msgid "Enable Clipboard Monitoring"
+msgstr "Monitora automaticamente gli appunti"
+
+msgid "A link was found in the clipboard. Download it?"
+msgstr "È stato trovato un link negli appunti. Scaricarlo?"
+
+msgid "Yes"
+msgstr "Sì"
+
+msgid "No"
+msgstr "No"
+
+msgid "Please wait"
+msgstr "Attendere"
+
+msgid "A preview is already loading."
+msgstr "È già in corso il caricamento di un’anteprima."

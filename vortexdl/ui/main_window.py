@@ -20,6 +20,7 @@ import queue
 from vortexdl.core.models import DownloadStatus
 from vortexdl.services.download_service import DownloadQueueService
 from vortexdl.services.metadata_service import MetadataService, VideoMetadata
+from vortexdl.services.clipboard_service import ClipboardMonitorService
 from vortexdl.ui.queue_view import QueueView
 from vortexdl.ui.preview_dialog import PreviewDialog
 
@@ -126,6 +127,10 @@ class VortexDLApp(ctk.CTk):
         self._pending_metadata_defaults = ("best", "video")
         self._active_task_id = None
         self._closing = False
+        self._clipboard_toast = None
+        self.clipboard_service = ClipboardMonitorService(
+            self, self._show_clipboard_toast, poll_interval_ms=1000
+        )
 
         self.current_lang = CURRENT_LANG
         self.settings = USER_SETTINGS
@@ -157,6 +162,8 @@ class VortexDLApp(ctk.CTk):
         self._active_tab = "downloader"
 
         self._build_ui()
+        if self.settings.get("clipboard_monitoring", False):
+            self.clipboard_service.start()
         self.after(100, self._drain_download_events)
         self.after(100, self._drain_metadata_results)
         self.protocol("WM_DELETE_WINDOW", self._on_close)
@@ -523,6 +530,19 @@ class VortexDLApp(ctk.CTk):
             progress_color=COLORS["accent"]
         ).pack(side="left")
 
+        # Clipboard monitoring (opt-in; clipboard contents are never persisted)
+        cb_frame = ctk.CTkFrame(card, fg_color="transparent")
+        cb_frame.pack(fill="x", padx=20, pady=8)
+        self.clipboard_monitor_var = ctk.BooleanVar(
+            value=bool(self.settings.get("clipboard_monitoring", False))
+        )
+        ctk.CTkSwitch(
+            cb_frame, text=f"📋  {_('Enable Clipboard Monitoring')}",
+            variable=self.clipboard_monitor_var,
+            command=self._apply_clipboard_monitor_setting,
+            font=ctk.CTkFont(size=13), progress_color=COLORS["accent"]
+        ).pack(side="left")
+
         # Cloud Sync API Keys (User-Configurable)
         cloud_card = self._create_card(self.main_container, f"☁️  {_('Cloud Sync / Storage')}")
         
@@ -593,12 +613,88 @@ class VortexDLApp(ctk.CTk):
                 widget.destroy()
             self._build_ui()
 
+    def _apply_clipboard_monitor_setting(self):
+        """Persist the user's opt-in choice and start/stop Tk-safe polling."""
+        enabled = bool(self.clipboard_monitor_var.get())
+        self.settings["clipboard_monitoring"] = enabled
+        save_settings(self.settings)
+        if enabled:
+            self.clipboard_service.start()
+        else:
+            self.clipboard_service.stop()
+            self._close_clipboard_toast()
+
+    def _close_clipboard_toast(self):
+        toast = self._clipboard_toast
+        self._clipboard_toast = None
+        if toast is not None:
+            try:
+                if toast.winfo_exists():
+                    toast.destroy()
+            except Exception:
+                pass
+
+    def _show_clipboard_toast(self, url):
+        if self._closing or not self.settings.get("clipboard_monitoring", False):
+            return
+        self._close_clipboard_toast()
+
+        toast = ctk.CTkToplevel(self)
+        self._clipboard_toast = toast
+        toast.title(_("Clipboard"))
+        toast.geometry("390x170")
+        toast.resizable(False, False)
+        toast.transient(self)
+        try:
+            toast.attributes("-topmost", True)
+        except Exception:
+            pass
+        self.update_idletasks()
+        x = self.winfo_rootx() + self.winfo_width() - 410
+        y = self.winfo_rooty() + self.winfo_height() - 200
+        toast.geometry(f"+{max(0, x)}+{max(0, y)}")
+
+        ctk.CTkLabel(
+            toast, text=_("A link was found in the clipboard. Download it?"),
+            wraplength=350, justify="left", font=ctk.CTkFont(size=14, weight="bold")
+        ).pack(fill="x", padx=18, pady=(18, 6))
+        ctk.CTkLabel(
+            toast, text=url, wraplength=350, justify="left",
+            text_color=COLORS["text_muted"], font=ctk.CTkFont(size=11)
+        ).pack(fill="x", padx=18, pady=(0, 10))
+
+        buttons = ctk.CTkFrame(toast, fg_color="transparent")
+        buttons.pack(fill="x", padx=18, pady=(0, 14))
+        ctk.CTkButton(
+            buttons, text=_("No"), width=90, height=32,
+            fg_color=COLORS["bg_card"], command=self._close_clipboard_toast
+        ).pack(side="right", padx=(8, 0))
+
+        def accept_url():
+            self._close_clipboard_toast()
+            if self._metadata_request_id:
+                messagebox.showinfo(_("Please wait"), _("A preview is already loading."))
+                return
+            self._switch_tab("downloader")
+            self.url_entry.delete(0, "end")
+            self.url_entry.insert(0, url)
+            self._start_download()
+
+        ctk.CTkButton(
+            buttons, text=_("Yes"), width=90, height=32,
+            fg_color=COLORS["accent_purple"], command=accept_url
+        ).pack(side="right")
+        toast.protocol("WM_DELETE_WINDOW", self._close_clipboard_toast)
+        toast.after(12000, lambda: self._close_clipboard_toast()
+                    if self._clipboard_toast is toast else None)
+
     def _save_settings_action(self):
         theme_ch = self.set_theme_menu.get()
         new_theme = "Light" if theme_ch in [_("Light"), "Light"] else "Dark"
         self.settings["default_quality"] = self.set_qual_menu.get()
         self.settings["theme"] = new_theme
         self.settings["disable_telemetry"] = self.telem_var.get()
+        self.settings["clipboard_monitoring"] = self.clipboard_monitor_var.get()
         self.settings["gdrive_api_key"] = self.gdrive_entry.get().strip()
         self.settings["onedrive_api_key"] = self.onedrive_entry.get().strip()
         save_settings(self.settings)
@@ -837,6 +933,8 @@ class VortexDLApp(ctk.CTk):
 
     def _on_close(self):
         self._closing = True
+        self.clipboard_service.stop()
+        self._close_clipboard_toast()
         self.metadata_service.shutdown(wait=False)
         self.download_service.shutdown(wait=False)
         self.destroy()
