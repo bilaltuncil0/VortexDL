@@ -52,7 +52,7 @@ jobs:
       - name: Install System Dependencies (macOS)
         if: runner.os == 'macOS'
         run: |
-          brew install ffmpeg aria2 gettext create-dmg || true
+          brew install ffmpeg aria2 gettext || true
 
       - name: Install System Dependencies (Windows)
         if: runner.os == 'Windows'
@@ -102,8 +102,27 @@ jobs:
       - name: Package macOS
         if: runner.os == 'macOS'
         run: |
-          chmod +x dist/VortexDL
-          cp dist/VortexDL ${{ matrix.asset_name }}
+          APP_BUNDLE="dist/VortexDL.app"
+          mkdir -p "$APP_BUNDLE/Contents/MacOS"
+          cp dist/VortexDL "$APP_BUNDLE/Contents/MacOS/VortexDL"
+          chmod +x "$APP_BUNDLE/Contents/MacOS/VortexDL"
+          cat > "$APP_BUNDLE/Contents/Info.plist" <<'PLIST'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>CFBundleExecutable</key><string>VortexDL</string>
+            <key>CFBundleIdentifier</key><string>com.bilaltuncil.vortexdl</string>
+            <key>CFBundleName</key><string>VortexDL</string>
+            <key>CFBundlePackageType</key><string>APPL</string>
+            <key>CFBundleShortVersionString</key><string>3.0.0</string>
+            <key>CFBundleVersion</key><string>3.0.0</string>
+            <key>LSMinimumSystemVersion</key><string>10.15</string>
+            <key>NSHighResolutionCapable</key><true/>
+          </dict>
+          </plist>
+          PLIST
+          hdiutil create -volname "VortexDL" -srcfolder "$APP_BUNDLE" -ov -format UDZO "${{ matrix.asset_name }}"
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
