@@ -228,3 +228,15 @@ msgstr "已加入队列："
 
 msgid "Audio (MP3)"
 msgstr "音频 (MP3)"
+
+msgid "Download Complete"
+msgstr "下载完成"
+
+msgid "Download completed: %(title)s"
+msgstr "下载完成：%(title)s"
+
+msgid "Download Failed"
+msgstr "下载失败"
+
+msgid "Download failed: %(title)s"
+msgstr "下载失败：%(title)s"

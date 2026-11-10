@@ -228,3 +228,15 @@ msgstr "Ajouté à la file :"
 
 msgid "Audio (MP3)"
 msgstr "Audio (MP3)"
+
+msgid "Download Complete"
+msgstr "Téléchargement terminé"
+
+msgid "Download completed: %(title)s"
+msgstr "Téléchargement terminé : %(title)s"
+
+msgid "Download Failed"
+msgstr "Échec du téléchargement"
+
+msgid "Download failed: %(title)s"
+msgstr "Échec du téléchargement : %(title)s"

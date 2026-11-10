@@ -228,3 +228,15 @@ msgstr "Kuyruğa eklendi:"
 
 msgid "Audio (MP3)"
 msgstr "Ses (MP3)"
+
+msgid "Download Complete"
+msgstr "İndirme Tamamlandı"
+
+msgid "Download completed: %(title)s"
+msgstr "İndirme tamamlandı: %(title)s"
+
+msgid "Download Failed"
+msgstr "İndirme Başarısız"
+
+msgid "Download failed: %(title)s"
+msgstr "İndirme başarısız: %(title)s"

@@ -228,3 +228,15 @@ msgstr "Added to queue:"
 
 msgid "Audio (MP3)"
 msgstr "Audio (MP3)"
+
+msgid "Download Complete"
+msgstr "Download Complete"
+
+msgid "Download completed: %(title)s"
+msgstr "Download completed: %(title)s"
+
+msgid "Download Failed"
+msgstr "Download Failed"
+
+msgid "Download failed: %(title)s"
+msgstr "Download failed: %(title)s"
