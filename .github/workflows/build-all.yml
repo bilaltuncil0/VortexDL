@@ -67,9 +67,11 @@ jobs:
 
       - name: Headless Sanity Check
         shell: bash
+        env:
+          PYTHONIOENCODING: utf-8
         run: |
           python -m py_compile $(find vortexdl -name '*.py') app.py downloader.py
-          python -c "import app, downloader; from vortexdl.core.models import DownloadTask, DownloadEvent; from vortexdl.services.download_service import DownloadQueueService; print('Tüm importlar ve modüller hatasız.')"
+          python -X utf8 -c "import app, downloader; from vortexdl.core.models import DownloadTask, DownloadEvent; from vortexdl.services.download_service import DownloadQueueService; print('Tüm importlar ve modüller hatasız.')"
 
       - name: Compile Translations
         run: |
