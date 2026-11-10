@@ -775,6 +775,11 @@ class VortexDLApp(ctk.CTk):
         self.destroy()
 
 
+def create_app():
+    """Build the application window without starting the Tk event loop."""
+    return VortexDLApp()
+
+
 if __name__ == "__main__":
-    app = VortexDLApp()
+    app = create_app()
     app.mainloop()
