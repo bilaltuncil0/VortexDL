@@ -162,3 +162,27 @@ msgstr "Open Folder"
 msgid "Notifications"
 msgstr "Notifications"
 
+
+msgid "Download Queue"
+msgstr "Download Queue"
+
+msgid "Waiting"
+msgstr "Waiting"
+
+msgid "Paused"
+msgstr "Paused"
+
+msgid "Pause"
+msgstr "Pause"
+
+msgid "Resume"
+msgstr "Resume"
+
+msgid "Active downloads"
+msgstr "Active downloads"
+
+msgid "Total speed"
+msgstr "Total speed"
+
+msgid "Stop"
+msgstr "Stop"

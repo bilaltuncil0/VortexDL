@@ -162,3 +162,27 @@ msgstr "Ordner öffnen"
 msgid "Notifications"
 msgstr "Benachrichtigungen"
 
+
+msgid "Download Queue"
+msgstr "Download-Warteschlange"
+
+msgid "Waiting"
+msgstr "Wartend"
+
+msgid "Paused"
+msgstr "Pausiert"
+
+msgid "Pause"
+msgstr "Pause"
+
+msgid "Resume"
+msgstr "Fortsetzen"
+
+msgid "Active downloads"
+msgstr "Aktive Downloads"
+
+msgid "Total speed"
+msgstr "Gesamtgeschwindigkeit"
+
+msgid "Stop"
+msgstr "Stoppen"

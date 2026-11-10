@@ -2,11 +2,20 @@ name: Cross-Platform Build & Release
 
 on:
   push:
+    branches:
+      - main
+      - feature/modular-download-architecture
+      - feature/queue-ui-multitask
     tags:
       - 'v*'
+  pull_request:
+    branches:
+      - main
+      - feature/modular-download-architecture
+  workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
@@ -22,7 +31,7 @@ jobs:
           - os: windows-latest
             binary_name: VortexDL.exe
             asset_name: VortexDL-Windows-x64.exe
-          - os: macos-13
+          - os: macos-15-intel
             binary_name: VortexDL
             asset_name: VortexDL-macOS-x64.dmg
 
@@ -45,7 +54,7 @@ jobs:
       - name: Install System Dependencies (macOS)
         if: runner.os == 'macOS'
         run: |
-          brew install ffmpeg aria2 gettext create-dmg || true
+          brew install ffmpeg aria2 gettext || true
 
       - name: Install System Dependencies (Windows)
         if: runner.os == 'Windows'
@@ -58,6 +67,14 @@ jobs:
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
 
+      - name: Headless Sanity Check
+        shell: bash
+        env:
+          PYTHONIOENCODING: utf-8
+        run: |
+          python -m py_compile $(find vortexdl -name '*.py') app.py downloader.py
+          python -X utf8 -c "import app, downloader; from vortexdl.core.models import DownloadTask, DownloadEvent; from vortexdl.services.download_service import DownloadQueueService; print('Tüm importlar ve modüller hatasız.')"
+
       - name: Compile Translations
         run: |
           python -c "
@@ -69,13 +86,7 @@ jobs:
                   subprocess.run(['msgfmt', po, '-o', mo], check=False)
           " || true
 
-      - name: Build with PyInstaller (Linux / macOS)
-        if: runner.os != 'Windows'
-        run: |
-          pyinstaller --noconfirm --clean VortexDL.spec
-
-      - name: Build with PyInstaller (Windows)
-        if: runner.os == 'Windows'
+      - name: Build with PyInstaller
         run: |
           pyinstaller --noconfirm --clean VortexDL.spec
 
@@ -93,8 +104,27 @@ jobs:
       - name: Package macOS
         if: runner.os == 'macOS'
         run: |
-          chmod +x dist/VortexDL
-          cp dist/VortexDL ${{ matrix.asset_name }}
+          APP_BUNDLE="dist/VortexDL.app"
+          mkdir -p "$APP_BUNDLE/Contents/MacOS"
+          cp dist/VortexDL "$APP_BUNDLE/Contents/MacOS/VortexDL"
+          chmod +x "$APP_BUNDLE/Contents/MacOS/VortexDL"
+          cat > "$APP_BUNDLE/Contents/Info.plist" <<'PLIST'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>CFBundleExecutable</key><string>VortexDL</string>
+            <key>CFBundleIdentifier</key><string>com.bilaltuncil.vortexdl</string>
+            <key>CFBundleName</key><string>VortexDL</string>
+            <key>CFBundlePackageType</key><string>APPL</string>
+            <key>CFBundleShortVersionString</key><string>3.0.0</string>
+            <key>CFBundleVersion</key><string>3.0.0</string>
+            <key>LSMinimumSystemVersion</key><string>10.15</string>
+            <key>NSHighResolutionCapable</key><true/>
+          </dict>
+          </plist>
+          PLIST
+          hdiutil create -volname "VortexDL" -srcfolder "$APP_BUNDLE" -ov -format UDZO "${{ matrix.asset_name }}"
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
@@ -104,8 +134,11 @@ jobs:
 
   release:
     name: Create GitHub Release
+    if: startsWith(github.ref, 'refs/tags/v')
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4

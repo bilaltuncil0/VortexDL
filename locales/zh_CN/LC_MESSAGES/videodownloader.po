@@ -162,3 +162,27 @@ msgstr "打开文件夹"
 msgid "Notifications"
 msgstr "通知"
 
+
+msgid "Download Queue"
+msgstr "下载队列"
+
+msgid "Waiting"
+msgstr "等待中"
+
+msgid "Paused"
+msgstr "已暂停"
+
+msgid "Pause"
+msgstr "暂停"
+
+msgid "Resume"
+msgstr "继续"
+
+msgid "Active downloads"
+msgstr "活动下载"
+
+msgid "Total speed"
+msgstr "总速度"
+
+msgid "Stop"
+msgstr "停止"

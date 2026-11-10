@@ -1,32 +1,47 @@
 # -*- mode: python ; coding: utf-8 -*-
-from PyInstaller.utils.hooks import collect_all
-import os
+"""Cross-platform PyInstaller entry point for VortexDL."""
+from pathlib import Path
+import sys
+
+from PyInstaller.utils.hooks import (
+    collect_all,
+    collect_data_files,
+    collect_submodules,
+)
+
+ROOT = Path(SPECPATH).resolve()
 
 datas = [
-    ('assets', 'assets'),
-    ('icon.png', '.'),
-    ('locales', 'locales')
+    (str(ROOT / "assets"), "assets"),
+    (str(ROOT / "locales"), "locales"),
 ]
+root_icon = ROOT / "icon.png"
+if root_icon.exists():
+    datas.append((str(root_icon), "."))
+
 binaries = []
 hiddenimports = [
-    'yt_dlp.extractor._extractors',
-    'yt_dlp.utils',
-    'gettext',
-    'locale',
-    'sqlite3',
-    'storage',
-    'updater'
+    # Legacy top-level modules are still used for settings and updater behavior.
+    "storage",
+    "updater",
+    "sqlite3",
+    "gettext",
+    "locale",
+    "yt_dlp.extractor._extractors",
+    "yt_dlp.utils",
 ]
+hiddenimports += collect_submodules("vortexdl")
+datas += collect_data_files("vortexdl")
 
-tmp_ret = collect_all('yt_dlp')
-datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
+for package in ("yt_dlp", "customtkinter"):
+    package_datas, package_binaries, package_hiddenimports = collect_all(package)
+    datas += package_datas
+    binaries += package_binaries
+    hiddenimports += package_hiddenimports
 
-tmp_ret = collect_all('customtkinter')
-datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
-
-a = Analysis(
-    ['downloader.py'],
-    pathex=[],
+analysis = Analysis(
+    [str(ROOT / "app.py")],
+    pathex=[str(ROOT)],
     binaries=binaries,
     datas=datas,
     hiddenimports=hiddenimports,
@@ -37,15 +52,21 @@ a = Analysis(
     noarchive=False,
     optimize=0,
 )
-pyz = PYZ(a.pure)
+pyz = PYZ(analysis.pure)
+
+if sys.platform == "win32":
+    icon_path = ROOT / "assets" / "icon.ico"
+else:
+    icon_path = ROOT / "assets" / "icon.png"
+icon = str(icon_path) if icon_path.exists() else None
 
 exe = EXE(
     pyz,
-    a.scripts,
-    a.binaries,
-    a.datas,
+    analysis.scripts,
+    analysis.binaries,
+    analysis.datas,
     [],
-    name='VortexDL',
+    name="VortexDL",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -58,5 +79,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['assets/icon.png'],
+    icon=icon,
 )
