@@ -186,3 +186,45 @@ msgstr "总速度"
 
 msgid "Stop"
 msgstr "停止"
+
+msgid "Download Preview"
+msgstr "下载预览"
+
+msgid "Duration"
+msgstr "时长"
+
+msgid "Available formats"
+msgstr "可用格式"
+
+msgid "Open Cover Image"
+msgstr "打开封面图片"
+
+msgid "Choose quality or format"
+msgstr "选择质量或格式"
+
+msgid "Add to Queue"
+msgstr "加入队列"
+
+msgid "Unknown"
+msgstr "未知"
+
+msgid "Choose a quality or format."
+msgstr "请选择质量或格式。"
+
+msgid "Loading..."
+msgstr "正在加载..."
+
+msgid "Preview failed"
+msgstr "预览失败"
+
+msgid "Preview ready"
+msgstr "预览已就绪"
+
+msgid "Loading preview for:"
+msgstr "正在加载预览："
+
+msgid "Added to queue:"
+msgstr "已加入队列："
+
+msgid "Audio (MP3)"
+msgstr "音频 (MP3)"

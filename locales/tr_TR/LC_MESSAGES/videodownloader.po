@@ -186,3 +186,45 @@ msgstr "Toplam hız"
 
 msgid "Stop"
 msgstr "Durdur"
+
+msgid "Download Preview"
+msgstr "İndirme Önizlemesi"
+
+msgid "Duration"
+msgstr "Süre"
+
+msgid "Available formats"
+msgstr "Kullanılabilir biçimler"
+
+msgid "Open Cover Image"
+msgstr "Kapak Görselini Aç"
+
+msgid "Choose quality or format"
+msgstr "Kalite veya biçim seçin"
+
+msgid "Add to Queue"
+msgstr "Kuyruğa Ekle"
+
+msgid "Unknown"
+msgstr "Bilinmiyor"
+
+msgid "Choose a quality or format."
+msgstr "Bir kalite veya biçim seçin."
+
+msgid "Loading..."
+msgstr "Yükleniyor..."
+
+msgid "Preview failed"
+msgstr "Önizleme başarısız"
+
+msgid "Preview ready"
+msgstr "Önizleme hazır"
+
+msgid "Loading preview for:"
+msgstr "Önizleme yükleniyor:"
+
+msgid "Added to queue:"
+msgstr "Kuyruğa eklendi:"
+
+msgid "Audio (MP3)"
+msgstr "Ses (MP3)"

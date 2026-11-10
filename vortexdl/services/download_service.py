@@ -46,7 +46,7 @@ class DownloadQueueService:
             max_workers=self.max_workers, thread_name_prefix="vortexdl-download"
         )
 
-    def add(self, url: str, quality: str = "best", output_dir: str = "", media_format: str = "video") -> DownloadTask:
+    def add(self, url: str, quality: str = "best", output_dir: str = "", media_format: str = "video", title: str = "") -> DownloadTask:
         url = (url or "").strip()
         if not url:
             raise ValueError("URL boş olamaz.")
@@ -54,7 +54,8 @@ class DownloadQueueService:
             if self._closed:
                 raise RuntimeError("İndirme servisi kapatılmış.")
             task = DownloadTask(
-                url=url, quality=quality, output_dir=output_dir, media_format=media_format
+                url=url, quality=quality, output_dir=output_dir, media_format=media_format,
+                title=title,
             )
             cancel_event = threading.Event()
             pause_event = threading.Event()

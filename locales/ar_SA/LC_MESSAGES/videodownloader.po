@@ -186,3 +186,45 @@ msgstr "السرعة الإجمالية"
 
 msgid "Stop"
 msgstr "إيقاف"
+
+msgid "Download Preview"
+msgstr "معاينة التنزيل"
+
+msgid "Duration"
+msgstr "المدة"
+
+msgid "Available formats"
+msgstr "التنسيقات المتاحة"
+
+msgid "Open Cover Image"
+msgstr "فتح صورة الغلاف"
+
+msgid "Choose quality or format"
+msgstr "اختر الجودة أو التنسيق"
+
+msgid "Add to Queue"
+msgstr "إضافة إلى قائمة الانتظار"
+
+msgid "Unknown"
+msgstr "غير معروف"
+
+msgid "Choose a quality or format."
+msgstr "اختر جودة أو تنسيقًا."
+
+msgid "Loading..."
+msgstr "جارٍ التحميل..."
+
+msgid "Preview failed"
+msgstr "فشلت المعاينة"
+
+msgid "Preview ready"
+msgstr "المعاينة جاهزة"
+
+msgid "Loading preview for:"
+msgstr "جارٍ تحميل المعاينة لـ:"
+
+msgid "Added to queue:"
+msgstr "تمت الإضافة إلى قائمة الانتظار:"
+
+msgid "Audio (MP3)"
+msgstr "صوت (MP3)"

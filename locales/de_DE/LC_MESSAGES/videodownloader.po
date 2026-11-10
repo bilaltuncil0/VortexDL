@@ -186,3 +186,45 @@ msgstr "Gesamtgeschwindigkeit"
 
 msgid "Stop"
 msgstr "Stoppen"
+
+msgid "Download Preview"
+msgstr "Download-Vorschau"
+
+msgid "Duration"
+msgstr "Dauer"
+
+msgid "Available formats"
+msgstr "Verfügbare Formate"
+
+msgid "Open Cover Image"
+msgstr "Titelbild öffnen"
+
+msgid "Choose quality or format"
+msgstr "Qualität oder Format auswählen"
+
+msgid "Add to Queue"
+msgstr "Zur Warteschlange hinzufügen"
+
+msgid "Unknown"
+msgstr "Unbekannt"
+
+msgid "Choose a quality or format."
+msgstr "Wählen Sie eine Qualität oder ein Format."
+
+msgid "Loading..."
+msgstr "Wird geladen..."
+
+msgid "Preview failed"
+msgstr "Vorschau fehlgeschlagen"
+
+msgid "Preview ready"
+msgstr "Vorschau bereit"
+
+msgid "Loading preview for:"
+msgstr "Vorschau wird geladen für:"
+
+msgid "Added to queue:"
+msgstr "Zur Warteschlange hinzugefügt:"
+
+msgid "Audio (MP3)"
+msgstr "Audio (MP3)"

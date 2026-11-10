@@ -19,7 +19,9 @@ import queue
 
 from vortexdl.core.models import DownloadStatus
 from vortexdl.services.download_service import DownloadQueueService
+from vortexdl.services.metadata_service import MetadataService, VideoMetadata
 from vortexdl.ui.queue_view import QueueView
+from vortexdl.ui.preview_dialog import PreviewDialog
 
 from storage import load_settings, save_settings
 from vortexdl.storage.database import (
@@ -119,6 +121,9 @@ class VortexDLApp(ctk.CTk):
     def __init__(self):
         super().__init__()
         self.download_service = DownloadQueueService(max_workers=3)
+        self.metadata_service = MetadataService()
+        self._metadata_request_id = None
+        self._pending_metadata_defaults = ("best", "video")
         self._active_task_id = None
         self._closing = False
 
@@ -153,6 +158,7 @@ class VortexDLApp(ctk.CTk):
 
         self._build_ui()
         self.after(100, self._drain_download_events)
+        self.after(100, self._drain_metadata_results)
         self.protocol("WM_DELETE_WINDOW", self._on_close)
 
         # Run Auto-Updater asynchronously
@@ -361,6 +367,10 @@ class VortexDLApp(ctk.CTk):
             text_color="#ffffff", command=self._start_download
         )
         self.download_btn.pack(fill="x", pady=(0, 8))
+        if self._metadata_request_id:
+            self.download_btn.configure(
+                state="disabled", text=f"🔎  {_('Loading...')}"
+            )
 
         self.status_label = ctk.CTkLabel(
             queue_inner, text=_("Ready"), font=ctk.CTkFont(size=11),
@@ -701,29 +711,100 @@ class VortexDLApp(ctk.CTk):
         if not url:
             messagebox.showwarning(_("Warning"), _("Please enter a valid URL!"))
             return
-        fmt = self.format_var.get()
-        quality = self.quality_var.get()
-        is_audio = fmt in [_("Audio Only (MP3)"), "Audio Only (MP3)", "Sadece Ses (MP3)"]
-        if quality in [_("Best Quality"), "Best Quality", "En Yüksek"]:
+        if self._metadata_request_id:
+            return
+
+        selected_format = self.format_var.get()
+        is_audio = selected_format in [
+            _("Audio Only (MP3)"), "Audio Only (MP3)", "Sadece Ses (MP3)"
+        ]
+        selected_quality = self.quality_var.get()
+        if selected_quality in [_("Best Quality"), "Best Quality", "En Yüksek"]:
             quality = "best"
         else:
-            quality = quality.replace("p", "")
+            quality = selected_quality.replace("p", "")
+        self._pending_metadata_defaults = (
+            quality, "audio" if is_audio else "video"
+        )
+
         try:
-            task = self.download_service.add(
-                url=url,
-                quality=quality,
-                output_dir=self.download_dir,
-                media_format="audio" if is_audio else "video",
-            )
+            self._metadata_request_id = self.metadata_service.fetch(url)
         except (ValueError, RuntimeError) as exc:
             messagebox.showerror(_("Error occurred"), str(exc))
             return
-        self.url_entry.delete(0, "end")
-        if hasattr(self, "queue_view") and self.queue_view.winfo_exists():
-            self.queue_view.upsert(task)
+
+        if hasattr(self, "download_btn") and self.download_btn.winfo_exists():
+            self.download_btn.configure(
+                state="disabled", text=f"🔎  {_('Loading...')}"
+            )
+        self._set_queue_status(_("Loading..."), COLORS["accent"])
+        self._log(f"🔎 {_('Loading preview for: ')}{url}")
+
+    def _drain_metadata_results(self):
+        if self._closing:
+            return
+        try:
+            while True:
+                result = self.metadata_service.results.get_nowait()
+                if result.request_id != self._metadata_request_id:
+                    continue
+                self._metadata_request_id = None
+                self._restore_download_button()
+                if result.error:
+                    self._set_queue_status(_("Error occurred"), COLORS["danger"])
+                    messagebox.showerror(_("Preview failed"), result.error)
+                    continue
+                if result.metadata is not None:
+                    self._set_queue_status(_("Preview ready"), COLORS["success"])
+                    self._open_preview(result.metadata)
+        except queue.Empty:
+            pass
+        self.after(100, self._drain_metadata_results)
+
+    def _restore_download_button(self):
+        button = getattr(self, "download_btn", None)
+        if button is not None and button.winfo_exists():
+            button.configure(state="normal", text=f"⬇  {_('Download')}")
+
+    def _open_preview(self, metadata: VideoMetadata):
+        quality, media_format = self._pending_metadata_defaults
+        PreviewDialog(
+            self,
+            metadata,
+            colors=COLORS,
+            translate=_,
+            default_quality=quality,
+            default_media_format=media_format,
+            on_add=lambda selected_quality, selected_format: self._queue_preview_download(
+                metadata, selected_quality, selected_format
+            ),
+        )
+
+    def _queue_preview_download(
+        self, metadata: VideoMetadata, quality: str, media_format: str
+    ) -> bool:
+        try:
+            task = self.download_service.add(
+                url=metadata.url,
+                quality=quality,
+                output_dir=self.download_dir,
+                media_format=media_format,
+                title=metadata.title,
+            )
+        except (ValueError, RuntimeError) as exc:
+            messagebox.showerror(_("Error occurred"), str(exc))
+            return False
+
+        entry = getattr(self, "url_entry", None)
+        if entry is not None and entry.winfo_exists() and entry.get().strip() == metadata.url:
+            entry.delete(0, "end")
+        queue_view = getattr(self, "queue_view", None)
+        if queue_view is not None and queue_view.winfo_exists():
+            queue_view.upsert(task)
         self._set_queue_status(_("Waiting"), COLORS["warning"])
         self._update_queue_summary()
-        self._log(f"🔍 {_('Analyzing URL: ')}{url}")
+        self._log(f"📥 {_('Added to queue: ')}{metadata.title}")
+        return True
 
     def _drain_download_events(self):
         if self._closing:
@@ -756,6 +837,7 @@ class VortexDLApp(ctk.CTk):
 
     def _on_close(self):
         self._closing = True
+        self.metadata_service.shutdown(wait=False)
         self.download_service.shutdown(wait=False)
         self.destroy()
 
