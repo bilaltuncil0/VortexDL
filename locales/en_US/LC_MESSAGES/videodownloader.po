@@ -228,3 +228,12 @@ msgstr "Added to queue:"
 
 msgid "Audio (MP3)"
 msgstr "Audio (MP3)"
+
+msgid "Error. Retrying in %(seconds)s seconds... (%(retry_count)s/%(max_retries)s)"
+msgstr "Error. Retrying in %(seconds)s seconds... (%(retry_count)s/%(max_retries)s)"
+
+msgid "Retrying (%(retry_count)s/%(max_retries)s)"
+msgstr "Retrying (%(retry_count)s/%(max_retries)s)"
+
+msgid "Retrying in %(seconds)s seconds"
+msgstr "Retrying in %(seconds)s seconds"

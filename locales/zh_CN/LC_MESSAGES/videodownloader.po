@@ -228,3 +228,12 @@ msgstr "已加入队列："
 
 msgid "Audio (MP3)"
 msgstr "音频 (MP3)"
+
+msgid "Error. Retrying in %(seconds)s seconds... (%(retry_count)s/%(max_retries)s)"
+msgstr "出错。%(seconds)s 秒后重试... (%(retry_count)s/%(max_retries)s)"
+
+msgid "Retrying (%(retry_count)s/%(max_retries)s)"
+msgstr "正在重试 (%(retry_count)s/%(max_retries)s)"
+
+msgid "Retrying in %(seconds)s seconds"
+msgstr "%(seconds)s 秒后重试"

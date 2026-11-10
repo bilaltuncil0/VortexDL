@@ -812,7 +812,16 @@ class VortexDLApp(ctk.CTk):
         try:
             while True:
                 event = self.download_service.events.get_nowait()
-                if event.message and event.kind != "progress":
+                if event.kind == "retrying":
+                    self._log(
+                        _("Error. Retrying in %(seconds)s seconds... "
+                          "(%(retry_count)s/%(max_retries)s)") % {
+                            "seconds": int(event.retry_delay_seconds),
+                            "retry_count": event.retry_count,
+                            "max_retries": event.max_retries,
+                        }
+                    )
+                elif event.message and event.kind != "progress":
                     self._log(event.message)
                 task = self.download_service.get_task(event.task_id)
                 queue_view = getattr(self, "queue_view", None)
@@ -824,6 +833,14 @@ class VortexDLApp(ctk.CTk):
                     self._set_queue_status(_("Downloading..."), COLORS["accent"])
                 elif event.status == DownloadStatus.PAUSED:
                     self._set_queue_status(_("Paused"), COLORS["warning"])
+                elif event.status == DownloadStatus.RETRYING:
+                    self._set_queue_status(
+                        _("Retrying (%(retry_count)s/%(max_retries)s)") % {
+                            "retry_count": event.retry_count,
+                            "max_retries": event.max_retries,
+                        },
+                        COLORS["warning"],
+                    )
                 elif event.status == DownloadStatus.COMPLETED:
                     self._set_queue_status(_("Completed"), COLORS["success"])
                 elif event.status == DownloadStatus.CANCELLED:
