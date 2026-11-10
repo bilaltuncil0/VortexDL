@@ -20,6 +20,8 @@ import queue
 from vortexdl.core.models import DownloadStatus
 from vortexdl.services.download_service import DownloadQueueService
 from vortexdl.services.metadata_service import MetadataService, VideoMetadata
+from vortexdl.services.category_service import CategoryRoutingService
+from vortexdl.ui.settings_view import SmartCategoriesSettingsView
 from vortexdl.ui.queue_view import QueueView
 from vortexdl.ui.preview_dialog import PreviewDialog
 
@@ -122,6 +124,8 @@ class VortexDLApp(ctk.CTk):
         super().__init__()
         self.download_service = DownloadQueueService(max_workers=3)
         self.metadata_service = MetadataService()
+        self.category_service = CategoryRoutingService()
+        self._download_dir_manually_selected = False
         self._metadata_request_id = None
         self._pending_metadata_defaults = ("best", "video")
         self._active_task_id = None
@@ -489,7 +493,11 @@ class VortexDLApp(ctk.CTk):
     # VIEW 3: SETTINGS & PRIVACY (Obfuscated JSON)
     # =========================================================================
     def _render_settings_view(self):
-        card = self._create_card(self.main_container, f"⚙️  {_('Settings')} & {_('Theme')}")
+        settings_content = ctk.CTkScrollableFrame(
+            self.main_container, fg_color="transparent"
+        )
+        settings_content.pack(fill="both", expand=True)
+        card = self._create_card(settings_content, f"⚙️  {_('Settings')} & {_('Theme')}")
 
         # Default Quality
         q_frame = ctk.CTkFrame(card, fg_color="transparent")
@@ -523,8 +531,13 @@ class VortexDLApp(ctk.CTk):
             progress_color=COLORS["accent"]
         ).pack(side="left")
 
+        self.smart_categories_view = SmartCategoriesSettingsView(
+            settings_content, settings=self.settings, colors=COLORS, translate=_
+        )
+        self.smart_categories_view.pack(fill="x", pady=(0, 12))
+
         # Cloud Sync API Keys (User-Configurable)
-        cloud_card = self._create_card(self.main_container, f"☁️  {_('Cloud Sync / Storage')}")
+        cloud_card = self._create_card(settings_content, f"☁️  {_('Cloud Sync / Storage')}")
         
         g_row = ctk.CTkFrame(cloud_card, fg_color="transparent")
         g_row.pack(fill="x", padx=20, pady=6)
@@ -550,7 +563,7 @@ class VortexDLApp(ctk.CTk):
 
         # Save Button
         ctk.CTkButton(
-            self.main_container, text=f"💾  {_('Save Settings')}", height=44, corner_radius=22,
+            settings_content, text=f"💾  {_('Save Settings')}", height=44, corner_radius=22,
             fg_color=COLORS["accent_purple"], hover_color=COLORS["accent"],
             font=ctk.CTkFont(size=14, weight="bold"), command=self._save_settings_action
         ).pack(fill="x", pady=10)
@@ -601,6 +614,7 @@ class VortexDLApp(ctk.CTk):
         self.settings["disable_telemetry"] = self.telem_var.get()
         self.settings["gdrive_api_key"] = self.gdrive_entry.get().strip()
         self.settings["onedrive_api_key"] = self.onedrive_entry.get().strip()
+        self.settings.update(self.smart_categories_view.get_values())
         save_settings(self.settings)
 
         global COLORS
@@ -652,6 +666,7 @@ class VortexDLApp(ctk.CTk):
         p = filedialog.askdirectory(initialdir=self.download_dir)
         if p:
             self.download_dir = p
+            self._download_dir_manually_selected = True
             self.dir_label.configure(text=self._short_path(p))
 
     def _on_format_change(self, val):
@@ -784,10 +799,21 @@ class VortexDLApp(ctk.CTk):
         self, metadata: VideoMetadata, quality: str, media_format: str
     ) -> bool:
         try:
+            output_dir = self.category_service.resolve_output_dir(
+                url=metadata.url,
+                title=metadata.title,
+                media_format=media_format,
+                available_formats=metadata.available_formats,
+                default_folder=self.download_dir,
+                manual_folder=(
+                    self.download_dir if self._download_dir_manually_selected else ""
+                ),
+                settings=self.settings,
+            )
             task = self.download_service.add(
                 url=metadata.url,
                 quality=quality,
-                output_dir=self.download_dir,
+                output_dir=output_dir,
                 media_format=media_format,
                 title=metadata.title,
             )

@@ -228,3 +228,21 @@ msgstr "Kuyruğa eklendi:"
 
 msgid "Audio (MP3)"
 msgstr "Ses (MP3)"
+
+msgid "Smart Categories"
+msgstr "Akıllı Kategoriler"
+
+msgid "Enable Smart Categories"
+msgstr "Akıllı Kategorileri Etkinleştir"
+
+msgid "Music"
+msgstr "Müzik"
+
+msgid "Video"
+msgstr "Video"
+
+msgid "Documents"
+msgstr "Belgeler"
+
+msgid "Choose Folder"
+msgstr "Klasör Seç"

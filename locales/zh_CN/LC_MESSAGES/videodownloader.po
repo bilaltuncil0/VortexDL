@@ -228,3 +228,21 @@ msgstr "已加入队列："
 
 msgid "Audio (MP3)"
 msgstr "音频 (MP3)"
+
+msgid "Smart Categories"
+msgstr "智能分类"
+
+msgid "Enable Smart Categories"
+msgstr "启用智能分类"
+
+msgid "Music"
+msgstr "音乐"
+
+msgid "Video"
+msgstr "视频"
+
+msgid "Documents"
+msgstr "文档"
+
+msgid "Choose Folder"
+msgstr "选择文件夹"

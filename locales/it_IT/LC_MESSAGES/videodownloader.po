@@ -228,3 +228,21 @@ msgstr "Aggiunto alla coda:"
 
 msgid "Audio (MP3)"
 msgstr "Audio (MP3)"
+
+msgid "Smart Categories"
+msgstr "Categorie intelligenti"
+
+msgid "Enable Smart Categories"
+msgstr "Abilita categorie intelligenti"
+
+msgid "Music"
+msgstr "Musica"
+
+msgid "Video"
+msgstr "Video"
+
+msgid "Documents"
+msgstr "Documenti"
+
+msgid "Choose Folder"
+msgstr "Scegli cartella"

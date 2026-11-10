@@ -41,7 +41,11 @@ DEFAULT_SETTINGS = {
     "theme": "Dark",
     "language": "en_US",
     "gdrive_api_key": "",
-    "onedrive_api_key": ""
+    "onedrive_api_key": "",
+    "smart_categories_enabled": False,
+    "music_folder": str(Path.home() / "Music"),
+    "video_folder": str(Path.home() / "Videos"),
+    "documents_folder": str(Path.home() / "Documents")
 }
 
 def load_settings() -> dict:

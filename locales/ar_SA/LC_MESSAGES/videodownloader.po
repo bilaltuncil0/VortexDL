@@ -228,3 +228,21 @@ msgstr "تمت الإضافة إلى قائمة الانتظار:"
 
 msgid "Audio (MP3)"
 msgstr "صوت (MP3)"
+
+msgid "Smart Categories"
+msgstr "الفئات الذكية"
+
+msgid "Enable Smart Categories"
+msgstr "تفعيل الفئات الذكية"
+
+msgid "Music"
+msgstr "الموسيقى"
+
+msgid "Video"
+msgstr "الفيديو"
+
+msgid "Documents"
+msgstr "المستندات"
+
+msgid "Choose Folder"
+msgstr "اختيار مجلد"
