@@ -336,3 +336,12 @@ msgstr "Link in der Zwischenablage gefunden"
 
 msgid "Ignore"
 msgstr "Ignorieren"
+
+msgid "Auto-Update & Clean"
+msgstr "Automatische Aktualisierung und Bereinigung"
+
+msgid "Optimize and Update Now"
+msgstr "System jetzt optimieren und aktualisieren"
+
+msgid "Optimizing…"
+msgstr "Optimierung läuft…"
