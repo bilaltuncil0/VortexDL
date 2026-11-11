@@ -264,3 +264,21 @@ msgstr "请稍候"
 
 msgid "A preview is already loading."
 msgstr "预览已在加载中。"
+
+msgid "Smart Categories"
+msgstr "智能分类"
+
+msgid "Enable Smart Categories"
+msgstr "启用智能分类"
+
+msgid "Music"
+msgstr "音乐"
+
+msgid "Video"
+msgstr "视频"
+
+msgid "Documents"
+msgstr "文档"
+
+msgid "Choose Folder"
+msgstr "选择文件夹"

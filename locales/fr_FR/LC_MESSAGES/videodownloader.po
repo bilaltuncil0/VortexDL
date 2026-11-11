@@ -264,3 +264,21 @@ msgstr "Veuillez patienter"
 
 msgid "A preview is already loading."
 msgstr "Un aperçu est déjà en cours de chargement."
+
+msgid "Smart Categories"
+msgstr "Catégories intelligentes"
+
+msgid "Enable Smart Categories"
+msgstr "Activer les catégories intelligentes"
+
+msgid "Music"
+msgstr "Musique"
+
+msgid "Video"
+msgstr "Vidéo"
+
+msgid "Documents"
+msgstr "Documents"
+
+msgid "Choose Folder"
+msgstr "Choisir un dossier"

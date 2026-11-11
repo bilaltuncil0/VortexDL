@@ -264,3 +264,21 @@ msgstr "Lütfen bekleyin"
 
 msgid "A preview is already loading."
 msgstr "Zaten bir önizleme yükleniyor."
+
+msgid "Smart Categories"
+msgstr "Akıllı Kategoriler"
+
+msgid "Enable Smart Categories"
+msgstr "Akıllı Kategorileri Etkinleştir"
+
+msgid "Music"
+msgstr "Müzik"
+
+msgid "Video"
+msgstr "Video"
+
+msgid "Documents"
+msgstr "Belgeler"
+
+msgid "Choose Folder"
+msgstr "Klasör Seç"
