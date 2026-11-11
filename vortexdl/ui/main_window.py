@@ -696,6 +696,7 @@ class VortexDLApp(ctk.CTk):
         if self._closing or not self.settings.get("clipboard_monitoring", False):
             return
         self._close_clipboard_toast()
+        self.sound_service.play_queued()
 
         def accept_url():
             if self._metadata_request_id:
