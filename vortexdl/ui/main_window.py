@@ -26,6 +26,7 @@ from vortexdl.services.clipboard_service import ClipboardMonitorService
 from vortexdl.ui.queue_view import QueueView
 from vortexdl.ui.preview_dialog import PreviewDialog
 from vortexdl.ui.tray_manager import TrayManager
+from vortexdl.ui.glass_theme import THEME_CONFIGS, RADIUS
 
 from storage import load_settings, save_settings
 from vortexdl.storage.database import (
@@ -74,42 +75,7 @@ def setup_translation(lang_code):
 setup_translation(CURRENT_LANG)
 
 
-# --- Premium Color Palettes ---
-THEME_CONFIGS = {
-    "dark": {
-        "bg_primary":    "#0b0d19",
-        "bg_secondary":  "#131629",
-        "bg_card":       "#1b203a",
-        "accent":        "#00f0ff",
-        "accent_hover":  "#00b8c4",
-        "accent_purple": "#7928ca",
-        "text_primary":  "#ffffff",
-        "text_muted":    "#8e97b8",
-        "success":       "#00f5a0",
-        "warning":       "#ff9f43",
-        "danger":        "#ff3838",
-        "progress_fg":   "#00f0ff",
-        "border":        "#222847",
-        "tab_active":    "#1f2648"
-    },
-    "light": {
-        "bg_primary":    "#f7f9fc",
-        "bg_secondary":  "#ffffff",
-        "bg_card":       "#edf2f7",
-        "accent":        "#0984e3",
-        "accent_hover":  "#076bb8",
-        "accent_purple": "#6c5ce7",
-        "text_primary":  "#1e293b",
-        "text_muted":    "#64748b",
-        "success":       "#10b981",
-        "warning":       "#f59e0b",
-        "danger":        "#ef4444",
-        "progress_fg":   "#0984e3",
-        "border":        "#e2e8f0",
-        "tab_active":    "#e2e8f0"
-    }
-}
-
+# --- Cupertino glass palette ---
 active_mode = USER_SETTINGS.get("theme", "Dark").lower()
 if active_mode not in ["dark", "light"]:
     active_mode = "dark"
@@ -218,14 +184,14 @@ class VortexDLApp(ctk.CTk):
         nav_box.pack(side="left", padx=30, pady=16)
 
         self.nav_down_btn = ctk.CTkButton(
-            nav_box, text=f"📥  {_('Download')}", width=115, height=36, corner_radius=18,
+            nav_box, text=f"📥  {_('Download')}", width=115, height=36, corner_radius=RADIUS["pill"],
             fg_color=COLORS["tab_active"], text_color=COLORS["accent"], font=ctk.CTkFont(size=12, weight="bold"),
             command=lambda: self._switch_tab("downloader")
         )
         self.nav_down_btn.pack(side="left", padx=4)
 
         self.nav_hist_btn = ctk.CTkButton(
-            nav_box, text=f"📜  {_('History')}", width=110, height=36, corner_radius=18,
+            nav_box, text=f"📜  {_('History')}", width=110, height=36, corner_radius=RADIUS["pill"],
             fg_color="transparent", text_color=COLORS["text_muted"], font=ctk.CTkFont(size=12, weight="bold"),
             command=lambda: self._switch_tab("history")
         )
@@ -240,7 +206,7 @@ class VortexDLApp(ctk.CTk):
 
         # Update Alert Notification Button (hidden by default)
         self.update_btn = ctk.CTkButton(
-            self.header, text=f"🚀 {_('Update Available')}", height=32, corner_radius=16,
+            self.header, text=f"🚀 {_('Update Available')}", height=32, corner_radius=RADIUS["control"],
             fg_color=COLORS["accent_purple"], hover_color=COLORS["accent"],
             font=ctk.CTkFont(size=11, weight="bold"), command=self._on_update_clicked
         )
@@ -250,7 +216,7 @@ class VortexDLApp(ctk.CTk):
         self.lang_menu = ctk.CTkOptionMenu(
             self.header,
             values=["Türkçe", "English", "Deutsch", "Français", "Italiano", "العربية", "中文"],
-            variable=self.lang_var, width=105, height=32, corner_radius=16,
+            variable=self.lang_var, width=105, height=32, corner_radius=RADIUS["control"],
             fg_color=COLORS["bg_card"], button_color=COLORS["bg_card"], button_hover_color=COLORS["accent_hover"],
             font=ctk.CTkFont(size=11), command=self._on_language_select
         )
@@ -300,7 +266,7 @@ class VortexDLApp(ctk.CTk):
         self.url_entry = ctk.CTkEntry(
             url_card,
             placeholder_text=_("Paste URL here (YouTube, Instagram, TikTok, Twitter...)"),
-            font=ctk.CTkFont(size=13), height=46, corner_radius=14,
+            font=ctk.CTkFont(size=13), height=46, corner_radius=RADIUS["control"],
             border_color=COLORS["border"], fg_color=COLORS["bg_primary"], text_color=COLORS["text_primary"]
         )
         self.url_entry.pack(fill="x", padx=18, pady=(4, 12))
@@ -309,7 +275,7 @@ class VortexDLApp(ctk.CTk):
         btn_row.pack(fill="x", padx=18, pady=(0, 12))
 
         ctk.CTkButton(
-            btn_row, text=f"📋  {_('Paste')}", width=115, height=34, corner_radius=17,
+            btn_row, text=f"📋  {_('Paste')}", width=115, height=34, corner_radius=RADIUS["control"],
             fg_color=COLORS["bg_card"], hover_color=COLORS["accent_purple"],
             font=ctk.CTkFont(size=12, weight="bold"), command=self._paste_url
         ).pack(side="left", padx=(0, 8))
@@ -367,7 +333,7 @@ class VortexDLApp(ctk.CTk):
         )
         self.dir_label.pack(side="left", fill="x", expand=True)
         ctk.CTkButton(
-            dir_sub, text="📁", width=36, height=32, corner_radius=10,
+            dir_sub, text="📁", width=36, height=32, corner_radius=RADIUS["control"],
             fg_color=COLORS["bg_card"], hover_color=COLORS["accent_purple"], command=self._choose_dir
         ).pack(side="right")
 
@@ -379,7 +345,7 @@ class VortexDLApp(ctk.CTk):
         queue_inner.pack(fill="both", expand=True, padx=18, pady=(4, 10))
 
         self.download_btn = ctk.CTkButton(
-            queue_inner, text=f"⬇  {_('Download')}", height=42, corner_radius=21,
+            queue_inner, text=f"⬇  {_('Download')}", height=42, corner_radius=RADIUS["control"],
             font=ctk.CTkFont(size=14, weight="bold"),
             fg_color=COLORS["accent_purple"], hover_color=COLORS["accent"],
             text_color="#ffffff", command=self._start_download
@@ -409,7 +375,7 @@ class VortexDLApp(ctk.CTk):
             self.queue_view.upsert(task)
 
         summary = ctk.CTkFrame(
-            queue_inner, fg_color=COLORS["bg_card"], corner_radius=10
+            queue_inner, fg_color=COLORS["bg_card"], corner_radius=RADIUS["control"]
         )
         summary.pack(fill="x")
         self.active_count_label = ctk.CTkLabel(
@@ -441,7 +407,7 @@ class VortexDLApp(ctk.CTk):
             speed_limit_frame,
             values=list(self._speed_limit_choices),
             variable=self.speed_limit_var,
-            width=125, height=28, corner_radius=9,
+            width=125, height=28, corner_radius=RADIUS["control"],
             fg_color=COLORS["bg_secondary"], button_color=COLORS["bg_secondary"],
             button_hover_color=COLORS["accent_purple"],
             font=ctk.CTkFont(size=11),
@@ -633,7 +599,7 @@ class VortexDLApp(ctk.CTk):
 
         # Save Button
         ctk.CTkButton(
-            settings_content, text=f"💾  {_('Save Settings')}", height=44, corner_radius=22,
+            settings_content, text=f"💾  {_('Save Settings')}", height=44, corner_radius=RADIUS["control"],
             fg_color=COLORS["accent_purple"], hover_color=COLORS["accent"],
             font=ctk.CTkFont(size=14, weight="bold"), command=self._save_settings_action
         ).pack(fill="x", pady=10)
@@ -641,7 +607,7 @@ class VortexDLApp(ctk.CTk):
     # --- UI Helpers ---
     def _create_card(self, parent, title: str, expand: bool = False):
         card = ctk.CTkFrame(
-            parent, fg_color=COLORS["bg_secondary"], corner_radius=18,
+            parent, fg_color=COLORS["bg_secondary"], corner_radius=RADIUS["panel"],
             border_width=1, border_color=COLORS["border"]
         )
         card.pack(fill="both", expand=expand, pady=(0, 12))
