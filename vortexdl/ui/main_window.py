@@ -27,6 +27,8 @@ from vortexdl.ui.queue_view import QueueView
 from vortexdl.ui.preview_dialog import PreviewDialog
 from vortexdl.ui.tray_manager import TrayManager
 from vortexdl.ui.glass_theme import THEME_CONFIGS, RADIUS
+from vortexdl.services.sound_service import SoundService
+from vortexdl.ui.slide_toast import SlideToast
 
 from storage import load_settings, save_settings
 from vortexdl.storage.database import (
@@ -102,6 +104,7 @@ class VortexDLApp(ctk.CTk):
         self._pending_metadata_defaults = ("best", "video")
         self._active_task_id = None
         self._closing = False
+        self.sound_service = SoundService(self.settings.get('enable_sound_effects', True))
         self.tray_manager = TrayManager(ASSETS_DIR, translate=_)
         self._clipboard_toast = None
         self.clipboard_service = ClipboardMonitorService(
@@ -554,6 +557,18 @@ class VortexDLApp(ctk.CTk):
             progress_color=COLORS["accent"]
         ).pack(side="left")
 
+        # Optional UI sound effects
+        sound_frame = ctk.CTkFrame(card, fg_color="transparent")
+        sound_frame.pack(fill="x", padx=20, pady=8)
+        self.sound_effects_var = ctk.BooleanVar(
+            value=bool(self.settings.get("enable_sound_effects", True))
+        )
+        ctk.CTkSwitch(
+            sound_frame, text=f"🔊  {_('Enable Sound Effects')}",
+            variable=self.sound_effects_var, font=ctk.CTkFont(size=13),
+            progress_color=COLORS["accent"],
+        ).pack(side="left")
+
         # Clipboard monitoring (opt-in; clipboard contents are never persisted)
         cb_frame = ctk.CTkFrame(card, fg_color="transparent")
         cb_frame.pack(fill="x", padx=20, pady=8)
@@ -727,6 +742,8 @@ class VortexDLApp(ctk.CTk):
         self.settings["gdrive_api_key"] = self.gdrive_entry.get().strip()
         self.settings["onedrive_api_key"] = self.onedrive_entry.get().strip()
         self.settings["minimize_to_tray"] = self.minimize_to_tray_var.get()
+        self.settings["enable_sound_effects"] = self.sound_effects_var.get()
+        self.sound_service.set_enabled(self.settings["enable_sound_effects"])
         self.settings.update(self.smart_categories_view.get_values())
         save_settings(self.settings)
 
