@@ -2,24 +2,30 @@
 import customtkinter as ctk
 
 from vortexdl.core.models import DownloadStatus, DownloadTask
-from vortexdl.ui.glass_theme import RADIUS, GlassAnimator
+from vortexdl.ui.glass_theme import RADIUS
+from vortexdl.ui.animator import UIAnimator
 
 
 class TaskRow(ctk.CTkFrame):
     """One independently-updatable row in the download queue."""
     def __init__(self, master, task: DownloadTask, *, colors, translate,
-                 on_cancel, on_pause, on_resume, on_show_folder):
+                 on_cancel, on_pause, on_resume, on_show_folder, animator=None):
         super().__init__(master, fg_color=colors["bg_card"], corner_radius=RADIUS["panel"],
                          border_width=1, border_color=colors["border"])
         self.colors = colors
+        self.animator = animator or UIAnimator(self)
         self._ = translate
         self.on_cancel = on_cancel
         self.on_pause = on_pause
         self.on_resume = on_resume
         self.on_show_folder = on_show_folder
         self.task_id = task.task_id
-        self.animator = GlassAnimator(self)
+        self.animator = animator or UIAnimator(self)
         self._displayed_progress = 0.0
+        self.animator.bind_hover(
+            self, option="fg_color", normal=colors["bg_card"],
+            hover=colors["bg_hover"], duration_ms=150,
+        )
 
         top = ctk.CTkFrame(self, fg_color="transparent")
         top.pack(fill="x", padx=12, pady=(9, 3))
@@ -87,15 +93,12 @@ class TaskRow(ctk.CTkFrame):
         quality = self._("Best Quality") if task.quality in ("best", "Best Quality") else task.quality
         self.details_label.configure(text=f"{fmt} · {quality}")
         target_progress = max(0.0, min(1.0, task.progress / 100.0))
-        start_progress = self.animator.value("progress", self._displayed_progress)
-
-        def paint_progress(value):
-            self._displayed_progress = value
-            self.progress_bar.set(value)
-
-        self.animator.animate(
-            "progress", start_progress, target_progress, paint_progress, duration=0.22
+        start_progress = self._displayed_progress
+        self.animator.smooth_progress(
+            self.progress_bar, target_progress, start=start_progress,
+            duration_ms=220, key=("progress", self.task_id),
         )
+        self._displayed_progress = target_progress
         self.percent_label.configure(text=f"{task.progress:.1f}%")
         if task.status == DownloadStatus.RETRYING:
             retry_wait = self._("Retrying in %(seconds)s seconds") % {
@@ -144,7 +147,7 @@ class TaskRow(ctk.CTkFrame):
 
 class QueueView(ctk.CTkScrollableFrame):
     """Scrollable queue that updates only the row matching each task id."""
-    def __init__(self, master, *, colors, translate, on_cancel, on_pause, on_resume, on_show_folder, **kwargs):
+    def __init__(self, master, *, colors, translate, on_cancel, on_pause, on_resume, on_show_folder, animator=None, **kwargs):
         super().__init__(master, label_text=translate("Download Queue"),
                          fg_color=colors["bg_secondary"], corner_radius=RADIUS["panel"],
                          border_width=1, border_color=colors["border"], **kwargs)
@@ -170,6 +173,7 @@ class QueueView(ctk.CTkScrollableFrame):
                 self, task, colors=self.colors, translate=self._,
                 on_cancel=self.on_cancel, on_pause=self.on_pause,
                 on_resume=self.on_resume, on_show_folder=self.on_show_folder,
+                animator=self.animator,
             )
             self.rows[task.task_id] = row
             row.pack(fill="x", padx=5, pady=5)
