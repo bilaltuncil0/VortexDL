@@ -336,3 +336,12 @@ msgstr "Lien détecté dans le presse-papiers"
 
 msgid "Ignore"
 msgstr "Ignorer"
+
+msgid "Auto-Update & Clean"
+msgstr "Mise à jour et nettoyage automatiques"
+
+msgid "Optimize and Update Now"
+msgstr "Optimiser et mettre à jour maintenant"
+
+msgid "Optimizing…"
+msgstr "Optimisation…"
