@@ -41,7 +41,8 @@ DEFAULT_SETTINGS = {
     "theme": "Dark",
     "language": "en_US",
     "gdrive_api_key": "",
-    "onedrive_api_key": ""
+    "onedrive_api_key": "",
+    "clipboard_monitoring": False
 }
 
 def load_settings() -> dict:

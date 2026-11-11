@@ -246,3 +246,21 @@ msgstr "إعادة المحاولة (%(retry_count)s/%(max_retries)s)"
 
 msgid "Retrying in %(seconds)s seconds"
 msgstr "إعادة المحاولة بعد %(seconds)s ثانية"
+
+msgid "Enable Clipboard Monitoring"
+msgstr "مراقبة الحافظة تلقائيًا"
+
+msgid "A link was found in the clipboard. Download it?"
+msgstr "تم العثور على رابط في الحافظة. هل تريد تنزيله؟"
+
+msgid "Yes"
+msgstr "نعم"
+
+msgid "No"
+msgstr "لا"
+
+msgid "Please wait"
+msgstr "يرجى الانتظار"
+
+msgid "A preview is already loading."
+msgstr "يتم تحميل معاينة بالفعل."

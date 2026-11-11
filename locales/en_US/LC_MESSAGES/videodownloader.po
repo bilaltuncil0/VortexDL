@@ -246,3 +246,21 @@ msgstr "Retrying (%(retry_count)s/%(max_retries)s)"
 
 msgid "Retrying in %(seconds)s seconds"
 msgstr "Retrying in %(seconds)s seconds"
+
+msgid "Enable Clipboard Monitoring"
+msgstr "Enable Clipboard Monitoring"
+
+msgid "A link was found in the clipboard. Download it?"
+msgstr "A link was found in the clipboard. Download it?"
+
+msgid "Yes"
+msgstr "Yes"
+
+msgid "No"
+msgstr "No"
+
+msgid "Please wait"
+msgstr "Please wait"
+
+msgid "A preview is already loading."
+msgstr "A preview is already loading."

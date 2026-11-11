@@ -246,3 +246,21 @@ msgstr "Erneuter Versuch (%(retry_count)s/%(max_retries)s)"
 
 msgid "Retrying in %(seconds)s seconds"
 msgstr "Neuer Versuch in %(seconds)s Sekunden"
+
+msgid "Enable Clipboard Monitoring"
+msgstr "Zwischenablage automatisch überwachen"
+
+msgid "A link was found in the clipboard. Download it?"
+msgstr "Ein Link wurde in der Zwischenablage gefunden. Herunterladen?"
+
+msgid "Yes"
+msgstr "Ja"
+
+msgid "No"
+msgstr "Nein"
+
+msgid "Please wait"
+msgstr "Bitte warten"
+
+msgid "A preview is already loading."
+msgstr "Eine Vorschau wird bereits geladen."
