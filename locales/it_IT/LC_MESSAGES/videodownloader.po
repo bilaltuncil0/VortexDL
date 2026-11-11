@@ -336,3 +336,12 @@ msgstr "Link trovato negli appunti"
 
 msgid "Ignore"
 msgstr "Ignora"
+
+msgid "Auto-Update & Clean"
+msgstr "Aggiornamento e pulizia automatici"
+
+msgid "Optimize and Update Now"
+msgstr "Ottimizza e aggiorna ora"
+
+msgid "Optimizing…"
+msgstr "Ottimizzazione…"
