@@ -246,3 +246,21 @@ msgstr "Nouvelle tentative (%(retry_count)s/%(max_retries)s)"
 
 msgid "Retrying in %(seconds)s seconds"
 msgstr "Nouvelle tentative dans %(seconds)s secondes"
+
+msgid "Enable Clipboard Monitoring"
+msgstr "Surveiller automatiquement le presse-papiers"
+
+msgid "A link was found in the clipboard. Download it?"
+msgstr "Un lien a été trouvé dans le presse-papiers. Le télécharger ?"
+
+msgid "Yes"
+msgstr "Oui"
+
+msgid "No"
+msgstr "Non"
+
+msgid "Please wait"
+msgstr "Veuillez patienter"
+
+msgid "A preview is already loading."
+msgstr "Un aperçu est déjà en cours de chargement."

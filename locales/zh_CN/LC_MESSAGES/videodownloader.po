@@ -246,3 +246,21 @@ msgstr "正在重试 (%(retry_count)s/%(max_retries)s)"
 
 msgid "Retrying in %(seconds)s seconds"
 msgstr "%(seconds)s 秒后重试"
+
+msgid "Enable Clipboard Monitoring"
+msgstr "自动监控剪贴板"
+
+msgid "A link was found in the clipboard. Download it?"
+msgstr "剪贴板中发现一个链接。要下载吗？"
+
+msgid "Yes"
+msgstr "是"
+
+msgid "No"
+msgstr "否"
+
+msgid "Please wait"
+msgstr "请稍候"
+
+msgid "A preview is already loading."
+msgstr "预览已在加载中。"

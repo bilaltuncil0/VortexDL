@@ -246,3 +246,21 @@ msgstr "Yeniden deneniyor (%(retry_count)s/%(max_retries)s)"
 
 msgid "Retrying in %(seconds)s seconds"
 msgstr "%(seconds)s saniye sonra yeniden deneniyor"
+
+msgid "Enable Clipboard Monitoring"
+msgstr "Panoyu Otomatik İzle"
+
+msgid "A link was found in the clipboard. Download it?"
+msgstr "Panoda bir bağlantı bulundu. İndirilsin mi?"
+
+msgid "Yes"
+msgstr "Evet"
+
+msgid "No"
+msgstr "Hayır"
+
+msgid "Please wait"
+msgstr "Lütfen bekleyin"
+
+msgid "A preview is already loading."
+msgstr "Zaten bir önizleme yükleniyor."
