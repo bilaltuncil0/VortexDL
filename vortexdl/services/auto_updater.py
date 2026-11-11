@@ -69,6 +69,12 @@ class AutoUpdater:
         if not self.safe_to_update():
             self._notify("Update skipped because a download started.")
             return
+        dirty_again = self._run_git(
+            ["status", "--porcelain", "--untracked-files=all"]
+        ).stdout.strip()
+        if dirty_again:
+            self._notify("Update skipped because local files changed during the check.")
+            return
 
         requirements_changed = self._run_git(
             ["diff", "--name-only", "HEAD", "origin/main", "--", "requirements.txt"]
