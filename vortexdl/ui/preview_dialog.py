@@ -5,6 +5,7 @@ import customtkinter as ctk
 from tkinter import messagebox
 
 from vortexdl.services.metadata_service import VideoMetadata
+from vortexdl.ui.glass_theme import RADIUS
 
 
 class PreviewDialog(ctk.CTkToplevel):
@@ -68,6 +69,7 @@ class PreviewDialog(ctk.CTkToplevel):
                 body,
                 text=self._("Open Cover Image"),
                 height=30,
+                corner_radius=RADIUS["control"],
                 fg_color=colors["bg_card"],
                 hover_color=colors["accent_purple"],
                 command=lambda: webbrowser.open(metadata.thumbnail_url),
@@ -94,9 +96,10 @@ class PreviewDialog(ctk.CTkToplevel):
             body,
             values=labels,
             variable=self.selected_var,
+            corner_radius=RADIUS["control"],
             fg_color=colors["bg_card"],
             button_color=colors["bg_card"],
-            button_hover_color=colors["accent_purple"],
+            button_hover_color=colors["bg_hover"],
             text_color=colors["text_primary"],
         )
         self.quality_menu.pack(fill="x", padx=18, pady=(6, 18))
@@ -106,6 +109,7 @@ class PreviewDialog(ctk.CTkToplevel):
         ctk.CTkButton(
             actions,
             text=self._("Cancel"),
+            corner_radius=RADIUS["control"],
             fg_color=colors["bg_card"],
             hover_color=colors["danger"],
             command=self.destroy,
@@ -113,8 +117,9 @@ class PreviewDialog(ctk.CTkToplevel):
         ctk.CTkButton(
             actions,
             text=self._("Add to Queue"),
-            fg_color=colors["accent_purple"],
-            hover_color=colors["accent"],
+            corner_radius=RADIUS["control"],
+            fg_color=colors["accent"],
+            hover_color=colors["accent_hover"],
             command=self._add_to_queue,
         ).pack(side="right")
 
