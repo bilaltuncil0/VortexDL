@@ -336,3 +336,12 @@ msgstr "Panoda Bağlantı Bulundu"
 
 msgid "Ignore"
 msgstr "Yoksay"
+
+msgid "Auto-Update & Clean"
+msgstr "Otomatik Güncelleme ve Temizlik"
+
+msgid "Optimize and Update Now"
+msgstr "Sistemi Şimdi Optimize Et ve Güncelle"
+
+msgid "Optimizing…"
+msgstr "Optimize ediliyor…"
