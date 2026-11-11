@@ -228,3 +228,12 @@ msgstr "Added to queue:"
 
 msgid "Audio (MP3)"
 msgstr "Audio (MP3)"
+
+msgid "Best Video"
+msgstr "Best Video"
+
+msgid "Inspecting connection..."
+msgstr "Inspecting connection..."
+
+msgid "Inspecting link:"
+msgstr "Inspecting link:"

@@ -91,32 +91,44 @@ class MetadataService:
         formats = info.get("formats") or []
         resolutions = set()
         available_formats = set()
+        has_video = False
         for item in formats:
-            if not isinstance(item, dict) or item.get("vcodec") == "none":
+            if not isinstance(item, dict):
                 continue
+            video_codec = item.get("vcodec")
             height = item.get("height")
-            if height:
-                try:
-                    resolutions.add(int(height))
-                except (TypeError, ValueError):
-                    pass
-            ext = item.get("ext")
-            if ext:
-                available_formats.add(str(ext).upper())
+            if video_codec != "none" and (video_codec or height):
+                has_video = True
+                if height:
+                    try:
+                        resolutions.add(int(height))
+                    except (TypeError, ValueError):
+                        pass
+                ext = item.get("ext")
+                if ext:
+                    available_formats.add(str(ext).upper())
 
         if info.get("height"):
+            has_video = True
             try:
                 resolutions.add(int(info["height"]))
             except (TypeError, ValueError):
                 pass
+        if info.get("vcodec") and info.get("vcodec") != "none":
+            has_video = True
 
+        video_options = []
+        if has_video:
+            video_options = [
+                QualityOption("Best Video", "best", "video"),
+                *[
+                    QualityOption(f"{height}p", str(height), "video")
+                    for height in sorted(resolutions, reverse=True)
+                ],
+            ]
         quality_options = [
-            QualityOption("Best Quality", "best", "video"),
-            *[
-                QualityOption(f"{height}p", str(height), "video")
-                for height in sorted(resolutions, reverse=True)
-            ],
-            QualityOption("Audio (MP3)", "best", "audio"),
+            *video_options,
+            QualityOption("Audio Only (MP3)", "best", "audio"),
         ]
         duration = info.get("duration")
         try:

@@ -228,3 +228,12 @@ msgstr "Kuyruğa eklendi:"
 
 msgid "Audio (MP3)"
 msgstr "Ses (MP3)"
+
+msgid "Best Video"
+msgstr "En İyi Video"
+
+msgid "Inspecting connection..."
+msgstr "Bağlantı inceleniyor..."
+
+msgid "Inspecting link:"
+msgstr "İncelenen bağlantı:"
