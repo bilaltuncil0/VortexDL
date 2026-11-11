@@ -291,3 +291,15 @@ msgstr "Illimitée"
 
 msgid "Speed limit updated to: "
 msgstr "Limite de vitesse mise à jour : "
+
+msgid "Download Complete"
+msgstr "Téléchargement terminé"
+
+msgid "Download completed: %(title)s"
+msgstr "Téléchargement terminé : %(title)s"
+
+msgid "Download Failed"
+msgstr "Échec du téléchargement"
+
+msgid "Download failed: %(title)s"
+msgstr "Échec du téléchargement : %(title)s"

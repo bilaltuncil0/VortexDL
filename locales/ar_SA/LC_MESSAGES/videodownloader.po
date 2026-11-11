@@ -291,3 +291,15 @@ msgstr "بلا حدود"
 
 msgid "Speed limit updated to: "
 msgstr "تم تحديث حد السرعة إلى: "
+
+msgid "Download Complete"
+msgstr "اكتمل التنزيل"
+
+msgid "Download completed: %(title)s"
+msgstr "اكتمل التنزيل: %(title)s"
+
+msgid "Download Failed"
+msgstr "فشل التنزيل"
+
+msgid "Download failed: %(title)s"
+msgstr "فشل التنزيل: %(title)s"
