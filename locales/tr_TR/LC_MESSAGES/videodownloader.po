@@ -318,3 +318,21 @@ msgstr "Kapatıldığında Sistem Tepsisine Küçült"
 
 msgid "System tray could not be started; the window remains open."
 msgstr "Sistem tepsisi başlatılamadı; pencere açık bırakıldı."
+
+msgid "Enable Sound Effects"
+msgstr "Ses Efektlerini Etkinleştir"
+
+msgid "Queued"
+msgstr "Kuyruğa Eklendi"
+
+msgid "Download Complete"
+msgstr "İndirme Tamamlandı"
+
+msgid "Download Failed"
+msgstr "İndirme Başarısız"
+
+msgid "Clipboard link detected"
+msgstr "Panoda Bağlantı Bulundu"
+
+msgid "Ignore"
+msgstr "Yoksay"
