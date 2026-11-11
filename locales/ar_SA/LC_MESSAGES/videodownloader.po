@@ -318,3 +318,21 @@ msgstr "تصغير إلى علبة النظام عند الإغلاق"
 
 msgid "System tray could not be started; the window remains open."
 msgstr "تعذر بدء علبة النظام؛ ستبقى النافذة مفتوحة."
+
+msgid "Enable Sound Effects"
+msgstr "تفعيل المؤثرات الصوتية"
+
+msgid "Queued"
+msgstr "أُضيف إلى قائمة الانتظار"
+
+msgid "Download Complete"
+msgstr "اكتمل التنزيل"
+
+msgid "Download Failed"
+msgstr "فشل التنزيل"
+
+msgid "Clipboard link detected"
+msgstr "تم العثور على رابط في الحافظة"
+
+msgid "Ignore"
+msgstr "تجاهل"
