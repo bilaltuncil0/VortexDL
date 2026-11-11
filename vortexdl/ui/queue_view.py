@@ -85,14 +85,27 @@ class TaskRow(ctk.CTkFrame):
         self.details_label.configure(text=f"{fmt} · {quality}")
         self.progress_bar.set(max(0.0, min(1.0, task.progress / 100.0)))
         self.percent_label.configure(text=f"{task.progress:.1f}%")
-        eta = task.eta or "—"
-        rate = task.speed if task.speed else "0.00 MiB/s"
-        self.rate_label.configure(text=f"{rate}   ·   ETA {eta}")
+        if task.status == DownloadStatus.RETRYING:
+            retry_wait = self._("Retrying in %(seconds)s seconds") % {
+                "seconds": int(task.retry_delay_seconds)
+            }
+            self.rate_label.configure(text=retry_wait)
+        else:
+            eta = task.eta or "—"
+            rate = task.speed if task.speed else "0.00 MiB/s"
+            self.rate_label.configure(text=f"{rate}   ·   ETA {eta}")
 
         labels = {
             DownloadStatus.QUEUED: (self._("Waiting"), self.colors["warning"]),
             DownloadStatus.DOWNLOADING: (self._("Downloading..."), self.colors["accent"]),
             DownloadStatus.PAUSED: (self._("Paused"), self.colors["warning"]),
+            DownloadStatus.RETRYING: (
+                self._("Retrying (%(retry_count)s/%(max_retries)s)") % {
+                    "retry_count": task.retry_count,
+                    "max_retries": task.max_retries,
+                },
+                self.colors["warning"],
+            ),
             DownloadStatus.COMPLETED: (self._("Completed"), self.colors["success"]),
             DownloadStatus.FAILED: (self._("Error occurred"), self.colors["danger"]),
             DownloadStatus.CANCELLED: (self._("Cancelled"), self.colors["text_muted"]),
@@ -101,7 +114,7 @@ class TaskRow(ctk.CTkFrame):
         self.status_badge.configure(text=label, fg_color=color, text_color="#ffffff")
 
         active = task.status in (DownloadStatus.DOWNLOADING, DownloadStatus.PAUSED)
-        queued = task.status == DownloadStatus.QUEUED
+        queued = task.status in (DownloadStatus.QUEUED, DownloadStatus.RETRYING)
         if task.status == DownloadStatus.PAUSED:
             self.pause_button.configure(text=self._("Resume"), command=lambda: self.on_resume(self.task_id))
             self.pause_button.pack(side="right", padx=(5, 0))

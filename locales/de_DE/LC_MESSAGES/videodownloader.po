@@ -237,3 +237,12 @@ msgstr "Verbindung wird geprüft..."
 
 msgid "Inspecting link:"
 msgstr "Zu prüfender Link:"
+
+msgid "Error. Retrying in %(seconds)s seconds... (%(retry_count)s/%(max_retries)s)"
+msgstr "Fehler. Neuer Versuch in %(seconds)s Sekunden... (%(retry_count)s/%(max_retries)s)"
+
+msgid "Retrying (%(retry_count)s/%(max_retries)s)"
+msgstr "Erneuter Versuch (%(retry_count)s/%(max_retries)s)"
+
+msgid "Retrying in %(seconds)s seconds"
+msgstr "Neuer Versuch in %(seconds)s Sekunden"
