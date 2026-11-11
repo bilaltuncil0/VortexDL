@@ -282,3 +282,12 @@ msgstr "المستندات"
 
 msgid "Choose Folder"
 msgstr "اختيار مجلد"
+
+msgid "Speed Limit"
+msgstr "حد السرعة"
+
+msgid "Unlimited"
+msgstr "بلا حدود"
+
+msgid "Speed limit updated to: "
+msgstr "تم تحديث حد السرعة إلى: "

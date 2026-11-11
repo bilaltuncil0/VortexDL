@@ -282,3 +282,12 @@ msgstr "Documents"
 
 msgid "Choose Folder"
 msgstr "Choose Folder"
+
+msgid "Speed Limit"
+msgstr "Speed Limit"
+
+msgid "Unlimited"
+msgstr "Unlimited"
+
+msgid "Speed limit updated to: "
+msgstr "Speed limit updated to: "

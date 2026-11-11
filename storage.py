@@ -46,7 +46,8 @@ DEFAULT_SETTINGS = {
     "smart_categories_enabled": False,
     "music_folder": str(Path.home() / "Music"),
     "video_folder": str(Path.home() / "Videos"),
-    "documents_folder": str(Path.home() / "Documents")
+    "documents_folder": str(Path.home() / "Documents"),
+    "global_speed_limit": 0
 }
 
 def load_settings() -> dict:
