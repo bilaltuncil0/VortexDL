@@ -336,3 +336,12 @@ msgstr "تم العثور على رابط في الحافظة"
 
 msgid "Ignore"
 msgstr "تجاهل"
+
+msgid "Auto-Update & Clean"
+msgstr "التحديث والتنظيف التلقائي"
+
+msgid "Optimize and Update Now"
+msgstr "تحسين النظام وتحديثه الآن"
+
+msgid "Optimizing…"
+msgstr "جارٍ التحسين…"
