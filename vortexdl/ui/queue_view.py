@@ -68,12 +68,12 @@ class TaskRow(ctk.CTkFrame):
         self.folder_button.pack(side="right", padx=(5, 0))
         self.cancel_button = ctk.CTkButton(
             bottom, text=self._("Cancel"), width=72, height=26, corner_radius=RADIUS["control"],
-            fg_color=colors["danger"], hover_color="#b30000",
+            fg_color=colors["danger"], hover_color=colors["danger"],
             command=lambda: self.on_cancel(self.task_id),
         )
         self.cancel_button.pack(side="right", padx=(5, 0))
         self.pause_button = ctk.CTkButton(
-            bottom, text=self._("Stop"), width=72, height=26,
+            bottom, text=self._("Stop"), width=72, height=26, corner_radius=RADIUS["control"],
             fg_color=colors["warning"], hover_color=colors["accent_hover"],
             command=lambda: self.on_pause(self.task_id),
         )
