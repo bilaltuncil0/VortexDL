@@ -318,3 +318,21 @@ msgstr "Beim Schließen in den Infobereich minimieren"
 
 msgid "System tray could not be started; the window remains open."
 msgstr "Systemablage konnte nicht gestartet werden; das Fenster bleibt geöffnet."
+
+msgid "Enable Sound Effects"
+msgstr "Soundeffekte aktivieren"
+
+msgid "Queued"
+msgstr "Zur Warteschlange hinzugefügt"
+
+msgid "Download Complete"
+msgstr "Download abgeschlossen"
+
+msgid "Download Failed"
+msgstr "Download fehlgeschlagen"
+
+msgid "Clipboard link detected"
+msgstr "Link in der Zwischenablage gefunden"
+
+msgid "Ignore"
+msgstr "Ignorieren"
