@@ -237,3 +237,12 @@ msgstr "Analisi della connessione..."
 
 msgid "Inspecting link:"
 msgstr "Link analizzato:"
+
+msgid "Error. Retrying in %(seconds)s seconds... (%(retry_count)s/%(max_retries)s)"
+msgstr "Errore. Nuovo tentativo tra %(seconds)s secondi... (%(retry_count)s/%(max_retries)s)"
+
+msgid "Retrying (%(retry_count)s/%(max_retries)s)"
+msgstr "Nuovo tentativo (%(retry_count)s/%(max_retries)s)"
+
+msgid "Retrying in %(seconds)s seconds"
+msgstr "Nuovo tentativo tra %(seconds)s secondi"

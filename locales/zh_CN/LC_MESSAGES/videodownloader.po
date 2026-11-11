@@ -237,3 +237,12 @@ msgstr "正在检查连接..."
 
 msgid "Inspecting link:"
 msgstr "正在检查链接："
+
+msgid "Error. Retrying in %(seconds)s seconds... (%(retry_count)s/%(max_retries)s)"
+msgstr "出错。%(seconds)s 秒后重试... (%(retry_count)s/%(max_retries)s)"
+
+msgid "Retrying (%(retry_count)s/%(max_retries)s)"
+msgstr "正在重试 (%(retry_count)s/%(max_retries)s)"
+
+msgid "Retrying in %(seconds)s seconds"
+msgstr "%(seconds)s 秒后重试"

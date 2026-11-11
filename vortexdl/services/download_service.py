@@ -33,13 +33,15 @@ _SPEED_FACTORS = {
 
 class DownloadQueueService:
     """Tracks tasks and runs up to max_workers downloads concurrently."""
-    def __init__(self, events: Optional[queue.Queue] = None, max_workers: int = 3):
+    def __init__(self, events: Optional[queue.Queue] = None, max_workers: int = 3, retry_delay_seconds: float = 5.0):
         self.events = events if events is not None else queue.Queue()
         self.max_workers = max(1, int(max_workers))
+        self.retry_delay_seconds = max(0.0, float(retry_delay_seconds))
         self._tasks = {}
         self._cancel_events = {}
         self._pause_events = {}
         self._futures: dict[str, Future] = {}
+        self._retry_timers: dict[str, threading.Timer] = {}
         self._lock = threading.RLock()
         self._closed = False
         self._executor = ThreadPoolExecutor(
@@ -79,11 +81,16 @@ class DownloadQueueService:
                 return False
             cancel_event.set()
             self._pause_events[task_id].clear()
+            timer = self._retry_timers.pop(task_id, None)
+            if timer is not None:
+                timer.cancel()
+            retrying = task.status == DownloadStatus.RETRYING
             cancelled_before_start = bool(future and future.cancel())
-        if cancelled_before_start:
+        if retrying or cancelled_before_start:
             self._change(
                 task_id, "cancelled", "İndirme iptal edildi.",
                 status=DownloadStatus.CANCELLED, speed="", speed_mib=0.0, eta="",
+                retry_delay_seconds=0.0,
             )
         return True
 
@@ -132,17 +139,24 @@ class DownloadQueueService:
             if self._closed:
                 return
             self._closed = True
-            pending = []
+            pending = set()
             for task_id, cancel_event in self._cancel_events.items():
                 cancel_event.set()
                 self._pause_events[task_id].clear()
+                timer = self._retry_timers.pop(task_id, None)
+                task = self._tasks.get(task_id)
+                if timer is not None:
+                    timer.cancel()
+                    if task is not None and task.status == DownloadStatus.RETRYING:
+                        pending.add(task_id)
                 future = self._futures.get(task_id)
                 if future and future.cancel():
-                    pending.append(task_id)
+                    pending.add(task_id)
         for task_id in pending:
             self._change(
                 task_id, "cancelled", "İndirme uygulama kapatılırken iptal edildi.",
                 status=DownloadStatus.CANCELLED, speed="", speed_mib=0.0, eta="",
+                retry_delay_seconds=0.0,
             )
         self._executor.shutdown(wait=wait, cancel_futures=True)
 
@@ -158,6 +172,9 @@ class DownloadQueueService:
             title=task.title,
             message=message,
             output_path=task.output_path,
+            retry_count=task.retry_count,
+            max_retries=task.max_retries,
+            retry_delay_seconds=task.retry_delay_seconds,
         ))
 
     def _change(self, task_id: str, kind: str, message: str = "", **changes) -> None:
@@ -192,7 +209,7 @@ class DownloadQueueService:
             if task.media_format == "audio" and not ffmpeg:
                 raise DependencyMissingError("MP3 dönüştürme için FFmpeg bulunamadı.")
             self._wait_if_paused(task_id, cancel_event, pause_event)
-            self._change(task_id, "started", "İndirme başladı.", status=DownloadStatus.DOWNLOADING)
+            self._change(task_id, "started", "İndirme başladı.", status=DownloadStatus.DOWNLOADING, error="", retry_delay_seconds=0.0)
 
             def progress_hook(data):
                 self._wait_if_paused(task_id, cancel_event, pause_event)
@@ -255,30 +272,97 @@ class DownloadQueueService:
         except DownloadCancelled as exc:
             self._change(
                 task_id, "cancelled", str(exc), status=DownloadStatus.CANCELLED,
-                speed="", speed_mib=0.0, eta="",
+                speed="", speed_mib=0.0, eta="", retry_delay_seconds=0.0,
             )
         except OSError as exc:
             if exc.errno == errno.ENOSPC:
-                error = DiskFullError("Hedef diskte yeterli boş alan yok.")
+                self._mark_failed(task_id, DiskFullError("Hedef diskte yeterli boş alan yok."))
             elif exc.errno in (errno.EACCES, errno.EPERM):
-                error = OutputDirectoryError("Hedef klasöre yazma izni yok.")
+                self._mark_failed(task_id, OutputDirectoryError("Hedef klasöre yazma izni yok."))
+            elif exc.errno in {
+                getattr(errno, name, -1) for name in (
+                    "ECONNRESET", "ECONNABORTED", "ETIMEDOUT", "EHOSTUNREACH",
+                    "ENETUNREACH", "ECONNREFUSED", "EPIPE",
+                )
+            }:
+                self._schedule_retry(task_id, NetworkDownloadError(str(exc)))
             else:
-                error = OutputDirectoryError(str(exc))
-            self._mark_failed(task_id, error)
+                self._mark_failed(task_id, OutputDirectoryError(str(exc)))
         except (DependencyMissingError, DownloadError) as exc:
             self._mark_failed(task_id, exc)
         except yt_dlp.utils.DownloadError as exc:
-            message = str(exc)
-            network_markers = ("network", "connection", "timed out", "temporary failure", "unable to download")
-            error = NetworkDownloadError(message) if any(word in message.lower() for word in network_markers) else DownloadError(message)
-            self._mark_failed(task_id, error)
+            self._schedule_retry(task_id, DownloadError(str(exc)))
         except Exception as exc:
-            self._mark_failed(task_id, DownloadError(f"Beklenmeyen indirme hatası: {exc}"), repr(exc))
+            self._mark_failed(
+                task_id, DownloadError(f"Beklenmeyen indirme hatası: {exc}"), repr(exc)
+            )
+
+    def _schedule_retry(self, task_id: str, error: Exception) -> None:
+        exhausted = False
+        cancelled = False
+        with self._lock:
+            task = self._tasks.get(task_id)
+            cancel_event = self._cancel_events.get(task_id)
+            if task is None or cancel_event is None:
+                return
+            if self._closed or cancel_event.is_set():
+                cancelled = True
+            elif task.retry_count >= task.max_retries:
+                exhausted = True
+            else:
+                task.retry_count += 1
+                task.status = DownloadStatus.RETRYING
+                task.error = str(error)
+                task.speed = ""
+                task.speed_mib = 0.0
+                task.eta = ""
+                task.retry_delay_seconds = self.retry_delay_seconds
+                snapshot = replace(task)
+                self._emit(snapshot, "retrying", str(error))
+                timer = threading.Timer(
+                    self.retry_delay_seconds, self._retry_task, args=(task_id,)
+                )
+                timer.daemon = True
+                self._retry_timers[task_id] = timer
+                timer.start()
+
+        if cancelled:
+            self._change(
+                task_id, "cancelled", "İndirme iptal edildi.",
+                status=DownloadStatus.CANCELLED, speed="", speed_mib=0.0, eta="",
+                retry_delay_seconds=0.0,
+            )
+        elif exhausted:
+            self._mark_failed(task_id, error)
+
+    def _retry_task(self, task_id: str) -> None:
+        with self._lock:
+            self._retry_timers.pop(task_id, None)
+            task = self._tasks.get(task_id)
+            cancel_event = self._cancel_events.get(task_id)
+            if (
+                task is None
+                or cancel_event is None
+                or self._closed
+                or cancel_event.is_set()
+                or task.status != DownloadStatus.RETRYING
+            ):
+                return
+
+            task.status = DownloadStatus.QUEUED
+            task.speed = ""
+            task.speed_mib = 0.0
+            task.eta = ""
+            task.retry_delay_seconds = 0.0
+            snapshot = replace(task)
+            self._emit(snapshot, "queued", "Yeniden deneme kuyruğa alındı.")
+            self._futures[task_id] = self._executor.submit(self._run_task, task_id)
 
     def _mark_failed(self, task_id: str, error: Exception, detail: str = "") -> None:
         self._change(
             task_id, "failed", str(error), status=DownloadStatus.FAILED,
             error=detail or str(error), speed="", speed_mib=0.0, eta="",
+            retry_delay_seconds=0.0,
         )
 
     @staticmethod

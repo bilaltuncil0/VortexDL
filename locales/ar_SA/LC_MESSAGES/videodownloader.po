@@ -237,3 +237,12 @@ msgstr "جارٍ فحص الاتصال..."
 
 msgid "Inspecting link:"
 msgstr "الرابط قيد الفحص:"
+
+msgid "Error. Retrying in %(seconds)s seconds... (%(retry_count)s/%(max_retries)s)"
+msgstr "خطأ. ستتم إعادة المحاولة بعد %(seconds)s ثانية... (%(retry_count)s/%(max_retries)s)"
+
+msgid "Retrying (%(retry_count)s/%(max_retries)s)"
+msgstr "إعادة المحاولة (%(retry_count)s/%(max_retries)s)"
+
+msgid "Retrying in %(seconds)s seconds"
+msgstr "إعادة المحاولة بعد %(seconds)s ثانية"

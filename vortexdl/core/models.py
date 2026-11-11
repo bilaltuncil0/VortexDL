@@ -9,6 +9,7 @@ class DownloadStatus(str, Enum):
     QUEUED = "queued"
     DOWNLOADING = "downloading"
     PAUSED = "paused"
+    RETRYING = "retrying"
     COMPLETED = "completed"
     FAILED = "failed"
     CANCELLED = "cancelled"
@@ -30,6 +31,9 @@ class DownloadTask:
     status: DownloadStatus = DownloadStatus.QUEUED
     output_path: str = ""
     error: str = ""
+    retry_count: int = 0
+    max_retries: int = 3
+    retry_delay_seconds: float = 0.0
     created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 
@@ -46,3 +50,6 @@ class DownloadEvent:
     title: str = ""
     message: str = ""
     output_path: str = ""
+    retry_count: int = 0
+    max_retries: int = 3
+    retry_delay_seconds: float = 0.0
