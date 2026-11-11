@@ -318,3 +318,21 @@ msgstr "关闭时最小化到系统托盘"
 
 msgid "System tray could not be started; the window remains open."
 msgstr "无法启动系统托盘；窗口将保持打开。"
+
+msgid "Enable Sound Effects"
+msgstr "启用音效"
+
+msgid "Queued"
+msgstr "已加入队列"
+
+msgid "Download Complete"
+msgstr "下载完成"
+
+msgid "Download Failed"
+msgstr "下载失败"
+
+msgid "Clipboard link detected"
+msgstr "剪贴板中检测到链接"
+
+msgid "Ignore"
+msgstr "忽略"
