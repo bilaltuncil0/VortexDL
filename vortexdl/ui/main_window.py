@@ -465,7 +465,7 @@ class VortexDLApp(ctk.CTk):
 
         for row in entries:
             eid, title, url, fmt, qual, fpath, fsize, ts = row
-            item = ctk.CTkFrame(scroll, fg_color=COLORS["bg_card"], corner_radius=14)
+            item = ctk.CTkFrame(scroll, fg_color=COLORS["bg_card"], corner_radius=RADIUS["panel"] )
             item.pack(fill="x", padx=12, pady=6)
 
             info_box = ctk.CTkFrame(item, fg_color="transparent")
