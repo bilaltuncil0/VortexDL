@@ -303,3 +303,18 @@ msgstr "Échec du téléchargement"
 
 msgid "Download failed: %(title)s"
 msgstr "Échec du téléchargement : %(title)s"
+
+msgid "Show"
+msgstr "Afficher"
+
+msgid "Pause All"
+msgstr "Mettre tous les téléchargements en pause"
+
+msgid "Quit"
+msgstr "Quitter"
+
+msgid "Minimize to tray on close"
+msgstr "Réduire dans la zone de notification à la fermeture"
+
+msgid "System tray could not be started; the window remains open."
+msgstr "Impossible de démarrer la zone de notification ; la fenêtre reste ouverte."

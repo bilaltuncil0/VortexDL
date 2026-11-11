@@ -303,3 +303,18 @@ msgstr "下载失败"
 
 msgid "Download failed: %(title)s"
 msgstr "下载失败：%(title)s"
+
+msgid "Show"
+msgstr "显示"
+
+msgid "Pause All"
+msgstr "暂停全部下载"
+
+msgid "Quit"
+msgstr "退出"
+
+msgid "Minimize to tray on close"
+msgstr "关闭时最小化到系统托盘"
+
+msgid "System tray could not be started; the window remains open."
+msgstr "无法启动系统托盘；窗口将保持打开。"

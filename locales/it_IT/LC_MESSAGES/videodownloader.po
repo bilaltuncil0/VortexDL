@@ -303,3 +303,18 @@ msgstr "Download non riuscito"
 
 msgid "Download failed: %(title)s"
 msgstr "Download non riuscito: %(title)s"
+
+msgid "Show"
+msgstr "Mostra"
+
+msgid "Pause All"
+msgstr "Metti in pausa tutti i download"
+
+msgid "Quit"
+msgstr "Esci"
+
+msgid "Minimize to tray on close"
+msgstr "Riduci a icona nell’area di notifica alla chiusura"
+
+msgid "System tray could not be started; the window remains open."
+msgstr "Impossibile avviare l’area di notifica; la finestra rimane aperta."

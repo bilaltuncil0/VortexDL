@@ -47,7 +47,8 @@ DEFAULT_SETTINGS = {
     "music_folder": str(Path.home() / "Music"),
     "video_folder": str(Path.home() / "Videos"),
     "documents_folder": str(Path.home() / "Documents"),
-    "global_speed_limit": 0
+    "global_speed_limit": 0,
+    "minimize_to_tray": True
 }
 
 def load_settings() -> dict:

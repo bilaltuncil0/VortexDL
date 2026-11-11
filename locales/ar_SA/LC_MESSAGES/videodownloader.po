@@ -303,3 +303,18 @@ msgstr "فشل التنزيل"
 
 msgid "Download failed: %(title)s"
 msgstr "فشل التنزيل: %(title)s"
+
+msgid "Show"
+msgstr "إظهار"
+
+msgid "Pause All"
+msgstr "إيقاف جميع التنزيلات مؤقتًا"
+
+msgid "Quit"
+msgstr "خروج"
+
+msgid "Minimize to tray on close"
+msgstr "تصغير إلى علبة النظام عند الإغلاق"
+
+msgid "System tray could not be started; the window remains open."
+msgstr "تعذر بدء علبة النظام؛ ستبقى النافذة مفتوحة."
