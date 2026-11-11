@@ -318,3 +318,21 @@ msgstr "Réduire dans la zone de notification à la fermeture"
 
 msgid "System tray could not be started; the window remains open."
 msgstr "Impossible de démarrer la zone de notification ; la fenêtre reste ouverte."
+
+msgid "Enable Sound Effects"
+msgstr "Activer les effets sonores"
+
+msgid "Queued"
+msgstr "Ajouté à la file d’attente"
+
+msgid "Download Complete"
+msgstr "Téléchargement terminé"
+
+msgid "Download Failed"
+msgstr "Échec du téléchargement"
+
+msgid "Clipboard link detected"
+msgstr "Lien détecté dans le presse-papiers"
+
+msgid "Ignore"
+msgstr "Ignorer"
