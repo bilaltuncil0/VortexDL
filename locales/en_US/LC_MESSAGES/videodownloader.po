@@ -336,3 +336,12 @@ msgstr "Clipboard link detected"
 
 msgid "Ignore"
 msgstr "Ignore"
+
+msgid "Auto-Update & Clean"
+msgstr "Auto-Update & Clean"
+
+msgid "Optimize and Update Now"
+msgstr "Optimize and Update Now"
+
+msgid "Optimizing…"
+msgstr "Optimizing…"
