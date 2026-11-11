@@ -318,3 +318,21 @@ msgstr "Riduci a icona nell’area di notifica alla chiusura"
 
 msgid "System tray could not be started; the window remains open."
 msgstr "Impossibile avviare l’area di notifica; la finestra rimane aperta."
+
+msgid "Enable Sound Effects"
+msgstr "Attiva effetti sonori"
+
+msgid "Queued"
+msgstr "Aggiunto alla coda"
+
+msgid "Download Complete"
+msgstr "Download completato"
+
+msgid "Download Failed"
+msgstr "Download non riuscito"
+
+msgid "Clipboard link detected"
+msgstr "Link trovato negli appunti"
+
+msgid "Ignore"
+msgstr "Ignora"
