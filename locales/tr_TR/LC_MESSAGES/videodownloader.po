@@ -282,3 +282,12 @@ msgstr "Belgeler"
 
 msgid "Choose Folder"
 msgstr "Klasör Seç"
+
+msgid "Speed Limit"
+msgstr "Hız Sınırı"
+
+msgid "Unlimited"
+msgstr "Limitsiz"
+
+msgid "Speed limit updated to: "
+msgstr "Hız sınırı şu şekilde güncellendi: "

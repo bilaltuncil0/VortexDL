@@ -282,3 +282,12 @@ msgstr "文档"
 
 msgid "Choose Folder"
 msgstr "选择文件夹"
+
+msgid "Speed Limit"
+msgstr "速度限制"
+
+msgid "Unlimited"
+msgstr "不限速"
+
+msgid "Speed limit updated to: "
+msgstr "速度限制已更新为："
