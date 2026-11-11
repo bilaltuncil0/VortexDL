@@ -33,7 +33,10 @@ class PreviewDialog(ctk.CTkToplevel):
         self.transient(master)
         self.protocol("WM_DELETE_WINDOW", self.destroy)
 
-        body = ctk.CTkFrame(self, fg_color=colors["bg_secondary"], corner_radius=16)
+        body = ctk.CTkFrame(
+            self, fg_color=colors["bg_secondary"], corner_radius=RADIUS["panel"],
+            border_width=1, border_color=colors["border"],
+        )
         body.pack(fill="both", expand=True, padx=18, pady=18)
 
         ctk.CTkLabel(
