@@ -303,3 +303,18 @@ msgstr "Download Failed"
 
 msgid "Download failed: %(title)s"
 msgstr "Download failed: %(title)s"
+
+msgid "Show"
+msgstr "Show"
+
+msgid "Pause All"
+msgstr "Pause All"
+
+msgid "Quit"
+msgstr "Quit"
+
+msgid "Minimize to tray on close"
+msgstr "Minimize to tray on close"
+
+msgid "System tray could not be started; the window remains open."
+msgstr "System tray could not be started; the window remains open."

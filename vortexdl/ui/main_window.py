@@ -25,6 +25,7 @@ from vortexdl.ui.settings_view import SmartCategoriesSettingsView
 from vortexdl.services.clipboard_service import ClipboardMonitorService
 from vortexdl.ui.queue_view import QueueView
 from vortexdl.ui.preview_dialog import PreviewDialog
+from vortexdl.ui.tray_manager import TrayManager
 
 from storage import load_settings, save_settings
 from vortexdl.storage.database import (
@@ -135,6 +136,7 @@ class VortexDLApp(ctk.CTk):
         self._pending_metadata_defaults = ("best", "video")
         self._active_task_id = None
         self._closing = False
+        self.tray_manager = TrayManager(ASSETS_DIR, translate=_)
         self._clipboard_toast = None
         self.clipboard_service = ClipboardMonitorService(
             self, self._show_clipboard_toast, poll_interval_ms=1000
@@ -169,6 +171,8 @@ class VortexDLApp(ctk.CTk):
         self._active_tab = "downloader"
 
         self._build_ui()
+        # Initialize detached tray integration before Tk enters mainloop.
+        self.tray_manager.start()
         if self.settings.get("clipboard_monitoring", False):
             self.clipboard_service.start()
         self.after(100, self._drain_download_events)
@@ -572,6 +576,18 @@ class VortexDLApp(ctk.CTk):
             progress_color=COLORS["accent"]
         ).pack(side="left")
 
+        # Close-to-tray preference
+        tray_frame = ctk.CTkFrame(card, fg_color="transparent")
+        tray_frame.pack(fill="x", padx=20, pady=(4, 12))
+        self.minimize_to_tray_var = ctk.BooleanVar(
+            value=bool(self.settings.get("minimize_to_tray", True))
+        )
+        ctk.CTkSwitch(
+            tray_frame, text=f"🧺  {_('Minimize to tray on close')}",
+            variable=self.minimize_to_tray_var, font=ctk.CTkFont(size=13),
+            progress_color=COLORS["accent"]
+        ).pack(side="left")
+
         # Clipboard monitoring (opt-in; clipboard contents are never persisted)
         cb_frame = ctk.CTkFrame(card, fg_color="transparent")
         cb_frame.pack(fill="x", padx=20, pady=8)
@@ -744,6 +760,7 @@ class VortexDLApp(ctk.CTk):
         self.settings["clipboard_monitoring"] = self.clipboard_monitor_var.get()
         self.settings["gdrive_api_key"] = self.gdrive_entry.get().strip()
         self.settings["onedrive_api_key"] = self.onedrive_entry.get().strip()
+        self.settings["minimize_to_tray"] = self.minimize_to_tray_var.get()
         self.settings.update(self.smart_categories_view.get_values())
         save_settings(self.settings)
 
@@ -1018,7 +1035,53 @@ class VortexDLApp(ctk.CTk):
         self.after(100, self._drain_download_events)
 
     def _on_close(self):
+        if self._closing:
+            return
+        if self.settings.get("minimize_to_tray", True):
+            if self.tray_manager.show():
+                self.withdraw()
+                self.after(100, self._drain_tray_events)
+                return
+            self._log(_("System tray could not be started; the window remains open."))
+            return
+        self._quit_app()
+
+    def _drain_tray_events(self):
+        if self._closing:
+            return
+        try:
+            while True:
+                event = self.tray_manager.events.get_nowait()
+                action = event[0] if isinstance(event, tuple) else event
+                if action == "show":
+                    self.tray_manager.hide()
+                    self.deiconify()
+                    self.state("normal")
+                    self.lift()
+                    self.focus_force()
+                elif action == "pause_all":
+                    for task in self.download_service.list_tasks():
+                        if task.status == DownloadStatus.DOWNLOADING:
+                            self.download_service.pause(task.task_id)
+                elif action == "quit":
+                    self._quit_app()
+                    return
+                elif action == "error":
+                    self.tray_manager.stop()
+                    self.deiconify()
+                    self.state("normal")
+                    self.lift()
+                    self._log(_("System tray could not be started; the window remains open."))
+        except queue.Empty:
+            pass
+        if self.state() == "withdrawn" and self.tray_manager.is_running:
+            self.after(200, self._drain_tray_events)
+
+    def _quit_app(self):
+        if self._closing:
+            return
         self._closing = True
+        self.tray_manager.stop()
         self.clipboard_service.stop()
         self._close_clipboard_toast()
         self.metadata_service.shutdown(wait=False)
