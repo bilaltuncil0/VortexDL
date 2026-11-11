@@ -29,7 +29,6 @@ class SystemOptimizer:
         try:
             removed["cache_dirs"] = self._remove_project_caches()
             roots = {self.project_root, *self.download_dirs}
-            roots.add(os.path.realpath(tempfile.gettempdir()))
             removed["partial_files"] = self._remove_old_partials(roots)
             removed["partial_files"] += self._remove_app_temp_files()
         finally:
@@ -92,6 +91,7 @@ class SystemOptimizer:
     @staticmethod
     def _remove_app_temp_files():
         temp_root = tempfile.gettempdir()
+        cutoff = time.time() - SystemOptimizer.MAX_PARTIAL_AGE_SECONDS
         deleted = 0
         try:
             names = os.listdir(temp_root)
@@ -102,10 +102,10 @@ class SystemOptimizer:
                 continue
             path = os.path.join(temp_root, name)
             try:
-                if os.path.isfile(path) and not os.path.islink(path):
+                if os.path.isfile(path) and not os.path.islink(path) and os.path.getmtime(path) < cutoff:
                     os.remove(path)
                     deleted += 1
-                elif os.path.isdir(path) and not os.path.islink(path):
+                elif os.path.isdir(path) and not os.path.islink(path) and os.path.getmtime(path) < cutoff:
                     shutil.rmtree(path)
                     deleted += 1
             except OSError:
