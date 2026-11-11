@@ -669,53 +669,35 @@ class VortexDLApp(ctk.CTk):
             self._close_clipboard_toast()
 
     def _close_clipboard_toast(self):
-        toast = self._clipboard_toast
-        self._clipboard_toast = None
+        toast = getattr(self, "_clipboard_toast", None)
         if toast is not None:
+            self._clipboard_toast = None
             try:
-                if toast.winfo_exists():
-                    toast.destroy()
+                toast.close()
             except Exception:
                 pass
+
+    def _show_status_toast(self, icon, title, message):
+        if self._closing:
+            return
+        self._close_clipboard_toast()
+        try:
+            toast = SlideToast(
+                self, title=title, message=message, icon=icon, colors=COLORS,
+                duration_ms=3500,
+                on_close=lambda closed: setattr(self, "_clipboard_toast", None)
+                if getattr(self, "_clipboard_toast", None) is closed else None,
+            )
+            self._clipboard_toast = toast
+        except Exception:
+            pass
 
     def _show_clipboard_toast(self, url):
         if self._closing or not self.settings.get("clipboard_monitoring", False):
             return
         self._close_clipboard_toast()
 
-        toast = ctk.CTkToplevel(self)
-        self._clipboard_toast = toast
-        toast.title(_("Clipboard"))
-        toast.geometry("390x170")
-        toast.resizable(False, False)
-        toast.transient(self)
-        try:
-            toast.attributes("-topmost", True)
-        except Exception:
-            pass
-        self.update_idletasks()
-        x = self.winfo_rootx() + self.winfo_width() - 410
-        y = self.winfo_rooty() + self.winfo_height() - 200
-        toast.geometry(f"+{max(0, x)}+{max(0, y)}")
-
-        ctk.CTkLabel(
-            toast, text=_("A link was found in the clipboard. Download it?"),
-            wraplength=350, justify="left", font=ctk.CTkFont(size=14, weight="bold")
-        ).pack(fill="x", padx=18, pady=(18, 6))
-        ctk.CTkLabel(
-            toast, text=url, wraplength=350, justify="left",
-            text_color=COLORS["text_muted"], font=ctk.CTkFont(size=11)
-        ).pack(fill="x", padx=18, pady=(0, 10))
-
-        buttons = ctk.CTkFrame(toast, fg_color="transparent")
-        buttons.pack(fill="x", padx=18, pady=(0, 14))
-        ctk.CTkButton(
-            buttons, text=_("No"), width=90, height=32,
-            fg_color=COLORS["bg_card"], command=self._close_clipboard_toast
-        ).pack(side="right", padx=(8, 0))
-
         def accept_url():
-            self._close_clipboard_toast()
             if self._metadata_request_id:
                 messagebox.showinfo(_("Please wait"), _("A preview is already loading."))
                 return
@@ -724,13 +706,19 @@ class VortexDLApp(ctk.CTk):
             self.url_entry.insert(0, url)
             self._start_download()
 
-        ctk.CTkButton(
-            buttons, text=_("Yes"), width=90, height=32,
-            fg_color=COLORS["accent_purple"], command=accept_url
-        ).pack(side="right")
-        toast.protocol("WM_DELETE_WINDOW", self._close_clipboard_toast)
-        toast.after(12000, lambda: self._close_clipboard_toast()
-                    if self._clipboard_toast is toast else None)
+        actions = [
+            (_("Ignore"), self._close_clipboard_toast, False),
+            (_("Download"), accept_url, True),
+        ]
+        try:
+            self._clipboard_toast = SlideToast(
+                self, title=_("Clipboard link detected"), message=url, icon="↗",
+                colors=COLORS, actions=actions, duration_ms=0,
+                on_close=lambda closed: setattr(self, "_clipboard_toast", None)
+                if getattr(self, "_clipboard_toast", None) is closed else None,
+            )
+        except Exception:
+            self._clipboard_toast = None
 
     def _save_settings_action(self):
         theme_ch = self.set_theme_menu.get()
@@ -977,6 +965,15 @@ class VortexDLApp(ctk.CTk):
         try:
             while True:
                 event = self.download_service.events.get_nowait()
+                if event.kind == "queued":
+                    self.sound_service.play_queued()
+                    self._show_status_toast("↓", _("Queued"), event.title or event.message)
+                if event.status == DownloadStatus.COMPLETED:
+                    self.sound_service.play_completed()
+                    self._show_status_toast("✓", _("Download Complete"), event.title or event.message)
+                elif event.status == DownloadStatus.FAILED:
+                    self.sound_service.play_error()
+                    self._show_status_toast("!", _("Download Failed"), event.title or event.message)
                 if event.kind == "retrying":
                     self._log(
                         _("Error. Retrying in %(seconds)s seconds... "
