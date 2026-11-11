@@ -318,3 +318,21 @@ msgstr "Minimize to tray on close"
 
 msgid "System tray could not be started; the window remains open."
 msgstr "System tray could not be started; the window remains open."
+
+msgid "Enable Sound Effects"
+msgstr "Enable Sound Effects"
+
+msgid "Queued"
+msgstr "Queued"
+
+msgid "Download Complete"
+msgstr "Download Complete"
+
+msgid "Download Failed"
+msgstr "Download Failed"
+
+msgid "Clipboard link detected"
+msgstr "Clipboard link detected"
+
+msgid "Ignore"
+msgstr "Ignore"
