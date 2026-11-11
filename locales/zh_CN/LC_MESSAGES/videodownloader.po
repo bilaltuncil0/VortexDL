@@ -336,3 +336,12 @@ msgstr "剪贴板中检测到链接"
 
 msgid "Ignore"
 msgstr "忽略"
+
+msgid "Auto-Update & Clean"
+msgstr "自动更新与清理"
+
+msgid "Optimize and Update Now"
+msgstr "立即优化并更新系统"
+
+msgid "Optimizing…"
+msgstr "正在优化…"
