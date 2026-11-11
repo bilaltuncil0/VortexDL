@@ -2,13 +2,14 @@
 import customtkinter as ctk
 
 from vortexdl.core.models import DownloadStatus, DownloadTask
+from vortexdl.ui.glass_theme import RADIUS, GlassAnimator
 
 
 class TaskRow(ctk.CTkFrame):
     """One independently-updatable row in the download queue."""
     def __init__(self, master, task: DownloadTask, *, colors, translate,
                  on_cancel, on_pause, on_resume, on_show_folder):
-        super().__init__(master, fg_color=colors["bg_card"], corner_radius=12,
+        super().__init__(master, fg_color=colors["bg_card"], corner_radius=RADIUS["panel"],
                          border_width=1, border_color=colors["border"])
         self.colors = colors
         self._ = translate
@@ -17,6 +18,8 @@ class TaskRow(ctk.CTkFrame):
         self.on_resume = on_resume
         self.on_show_folder = on_show_folder
         self.task_id = task.task_id
+        self.animator = GlassAnimator(self)
+        self._displayed_progress = 0.0
 
         top = ctk.CTkFrame(self, fg_color="transparent")
         top.pack(fill="x", padx=12, pady=(9, 3))
@@ -26,7 +29,7 @@ class TaskRow(ctk.CTkFrame):
         )
         self.title_label.pack(side="left", fill="x", expand=True)
         self.status_badge = ctk.CTkLabel(
-            top, text="", width=100, height=24, corner_radius=8,
+            top, text="", width=100, height=24, corner_radius=RADIUS["pill"],
             font=ctk.CTkFont(size=10, weight="bold"),
         )
         self.status_badge.pack(side="right", padx=(8, 0))
@@ -40,7 +43,7 @@ class TaskRow(ctk.CTkFrame):
         progress_row = ctk.CTkFrame(self, fg_color="transparent")
         progress_row.pack(fill="x", padx=12, pady=(0, 2))
         self.progress_bar = ctk.CTkProgressBar(
-            progress_row, height=10, corner_radius=6,
+            progress_row, height=10, corner_radius=RADIUS["pill"],
             progress_color=colors["accent"], fg_color=colors["bg_primary"],
         )
         self.progress_bar.pack(side="left", fill="x", expand=True, padx=(0, 10))
@@ -58,19 +61,19 @@ class TaskRow(ctk.CTkFrame):
         )
         self.rate_label.pack(side="left", fill="x", expand=True)
         self.folder_button = ctk.CTkButton(
-            bottom, text=self._("Open Folder"), width=100, height=26,
+            bottom, text=self._("Open Folder"), width=100, height=26, corner_radius=RADIUS["control"],
             fg_color=colors["bg_secondary"], hover_color=colors["accent_hover"],
             command=lambda: self.on_show_folder(self._current.output_path),
         )
         self.folder_button.pack(side="right", padx=(5, 0))
         self.cancel_button = ctk.CTkButton(
-            bottom, text=self._("Cancel"), width=72, height=26,
-            fg_color=colors["danger"], hover_color="#b30000",
+            bottom, text=self._("Cancel"), width=72, height=26, corner_radius=RADIUS["control"],
+            fg_color=colors["danger"], hover_color=colors["danger"],
             command=lambda: self.on_cancel(self.task_id),
         )
         self.cancel_button.pack(side="right", padx=(5, 0))
         self.pause_button = ctk.CTkButton(
-            bottom, text=self._("Stop"), width=72, height=26,
+            bottom, text=self._("Stop"), width=72, height=26, corner_radius=RADIUS["control"],
             fg_color=colors["warning"], hover_color=colors["accent_hover"],
             command=lambda: self.on_pause(self.task_id),
         )
@@ -83,7 +86,16 @@ class TaskRow(ctk.CTkFrame):
         fmt = self._("Audio Only (MP3)") if task.media_format == "audio" else self._("Video (MP4)")
         quality = self._("Best Quality") if task.quality in ("best", "Best Quality") else task.quality
         self.details_label.configure(text=f"{fmt} · {quality}")
-        self.progress_bar.set(max(0.0, min(1.0, task.progress / 100.0)))
+        target_progress = max(0.0, min(1.0, task.progress / 100.0))
+        start_progress = self.animator.value("progress", self._displayed_progress)
+
+        def paint_progress(value):
+            self._displayed_progress = value
+            self.progress_bar.set(value)
+
+        self.animator.animate(
+            "progress", start_progress, target_progress, paint_progress, duration=0.22
+        )
         self.percent_label.configure(text=f"{task.progress:.1f}%")
         if task.status == DownloadStatus.RETRYING:
             retry_wait = self._("Retrying in %(seconds)s seconds") % {
@@ -134,7 +146,7 @@ class QueueView(ctk.CTkScrollableFrame):
     """Scrollable queue that updates only the row matching each task id."""
     def __init__(self, master, *, colors, translate, on_cancel, on_pause, on_resume, on_show_folder, **kwargs):
         super().__init__(master, label_text=translate("Download Queue"),
-                         fg_color=colors["bg_secondary"], corner_radius=14,
+                         fg_color=colors["bg_secondary"], corner_radius=RADIUS["panel"],
                          border_width=1, border_color=colors["border"], **kwargs)
         self.colors = colors
         self._ = translate

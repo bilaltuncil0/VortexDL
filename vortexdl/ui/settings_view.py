@@ -1,6 +1,7 @@
 """Settings controls for smart download categories."""
 from pathlib import Path
 import customtkinter as ctk
+from vortexdl.ui.glass_theme import RADIUS
 from tkinter import filedialog
 
 
@@ -15,7 +16,7 @@ class SmartCategoriesSettingsView(ctk.CTkFrame):
 
     def __init__(self, master, *, settings, colors, translate):
         super().__init__(
-            master, fg_color=colors["bg_secondary"], corner_radius=16,
+            master, fg_color=colors["bg_secondary"], corner_radius=RADIUS["panel"],
             border_width=1, border_color=colors["border"],
         )
         self._settings = settings
@@ -55,7 +56,8 @@ class SmartCategoriesSettingsView(ctk.CTkFrame):
         self._paths[key] = (value, path_label)
         ctk.CTkButton(
             row, text=self._("Choose Folder"), width=115, height=30,
-            fg_color=self._colors["bg_card"],
+            corner_radius=RADIUS["control"],
+            fg_color=self._colors["bg_card"], hover_color=self._colors["bg_hover"],
             command=lambda k=key: self._choose_folder(k),
         ).pack(side="right")
 
