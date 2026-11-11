@@ -264,3 +264,21 @@ msgstr "يرجى الانتظار"
 
 msgid "A preview is already loading."
 msgstr "يتم تحميل معاينة بالفعل."
+
+msgid "Smart Categories"
+msgstr "الفئات الذكية"
+
+msgid "Enable Smart Categories"
+msgstr "تفعيل الفئات الذكية"
+
+msgid "Music"
+msgstr "الموسيقى"
+
+msgid "Video"
+msgstr "الفيديو"
+
+msgid "Documents"
+msgstr "المستندات"
+
+msgid "Choose Folder"
+msgstr "اختيار مجلد"
