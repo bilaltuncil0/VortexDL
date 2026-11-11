@@ -29,6 +29,7 @@ from vortexdl.ui.tray_manager import TrayManager
 from vortexdl.ui.glass_theme import THEME_CONFIGS, RADIUS
 from vortexdl.services.sound_service import SoundService
 from vortexdl.ui.slide_toast import SlideToast
+from vortexdl.ui.animator import UIAnimator
 from vortexdl.services.optimizer_service import SystemOptimizer
 from vortexdl.services.auto_updater import AutoUpdater as GitAutoUpdater
 
@@ -124,6 +125,15 @@ class VortexDLApp(ctk.CTk):
         self.geometry("880x730")
         self.minsize(780, 640)
         self.configure(fg_color=COLORS["bg_primary"])
+        self.window_opacity = max(
+            0.75, min(1.0, float(self.settings.get("window_opacity", 0.93)))
+        )
+        self.ui_animator = UIAnimator(
+            self,
+            enabled=bool(self.settings.get("window_animations_enabled", True)),
+            opacity=self.window_opacity,
+        )
+        self.ui_animator.apply_window_glass(self, self.window_opacity)
 
         # Set Icon
         for ext in ["png", "ico"]:
@@ -148,6 +158,8 @@ class VortexDLApp(ctk.CTk):
         self._active_tab = "downloader"
 
         self._build_ui()
+        if self.settings.get("window_animations_enabled", True):
+            self.ui_animator.fade_in(self, duration_ms=220)
         # Initialize detached tray integration before Tk enters mainloop.
         self.tray_manager.start()
         if self.settings.get("clipboard_monitoring", False):
@@ -398,6 +410,7 @@ class VortexDLApp(ctk.CTk):
             on_resume=self._resume_task,
             on_show_folder=self._open_file_folder,
             height=250,
+            animator=self.ui_animator,
         )
         self.queue_view.pack(fill="both", expand=True, pady=(0, 8))
         for task in self.download_service.list_tasks():
@@ -581,6 +594,39 @@ class VortexDLApp(ctk.CTk):
             tray_frame, text=f"🧺  {_('Minimize to tray on close')}",
             variable=self.minimize_to_tray_var, font=ctk.CTkFont(size=13),
             progress_color=COLORS["accent"]
+        ).pack(side="left")
+
+        # Live window glass opacity and motion preferences
+        glass_frame = ctk.CTkFrame(card, fg_color="transparent")
+        glass_frame.pack(fill="x", padx=20, pady=(8, 4))
+        ctk.CTkLabel(
+            glass_frame, text=f"🪟  {_('Glass Opacity')}",
+            text_color=COLORS["text_primary"], font=ctk.CTkFont(size=13),
+        ).pack(side="left")
+        self.opacity_value_label = ctk.CTkLabel(
+            glass_frame, text=f"{self.window_opacity:.0%}",
+            text_color=COLORS["text_muted"], width=42,
+        )
+        self.opacity_value_label.pack(side="right")
+        self.opacity_slider = ctk.CTkSlider(
+            card, from_=0.75, to=1.0, number_of_steps=25,
+            progress_color=COLORS["accent"], button_color=COLORS["accent"],
+            button_hover_color=COLORS["accent_hover"],
+            command=self._on_opacity_change,
+        )
+        self.opacity_slider.set(self.window_opacity)
+        self.opacity_slider.pack(fill="x", padx=20, pady=(2, 8))
+
+        motion_frame = ctk.CTkFrame(card, fg_color="transparent")
+        motion_frame.pack(fill="x", padx=20, pady=6)
+        self.window_animations_var = ctk.BooleanVar(
+            value=bool(self.settings.get("window_animations_enabled", True))
+        )
+        ctk.CTkSwitch(
+            motion_frame, text=f"✨  {_('Window Animations')}",
+            variable=self.window_animations_var,
+            command=self._on_window_animation_toggle,
+            font=ctk.CTkFont(size=13), progress_color=COLORS["accent"],
         ).pack(side="left")
 
         # Automatic updates and conservative cleanup
@@ -777,6 +823,9 @@ class VortexDLApp(ctk.CTk):
         self.settings["minimize_to_tray"] = self.minimize_to_tray_var.get()
         self.settings["enable_sound_effects"] = self.sound_effects_var.get()
         self.settings["auto_update_enabled"] = self.auto_update_var.get()
+        self.settings["window_opacity"] = self.window_opacity
+        self.settings["window_animations_enabled"] = self.window_animations_var.get()
+        self.ui_animator.set_enabled(self.settings["window_animations_enabled"])
         self.sound_service.set_enabled(self.settings["enable_sound_effects"])
         self.settings.update(self.smart_categories_view.get_values())
         save_settings(self.settings)
@@ -789,6 +838,16 @@ class VortexDLApp(ctk.CTk):
         for widget in self.winfo_children():
             widget.destroy()
         self._build_ui()
+
+    def _on_opacity_change(self, value):
+        self.window_opacity = max(0.75, min(1.0, float(value)))
+        self.ui_animator.apply_window_glass(self, self.window_opacity)
+        label = getattr(self, "opacity_value_label", None)
+        if label is not None and label.winfo_exists():
+            label.configure(text=f"{self.window_opacity:.0%}")
+
+    def _on_window_animation_toggle(self):
+        self.ui_animator.set_enabled(bool(self.window_animations_var.get()))
 
     def _handle_updater_status(self, message):
         if self._closing:
@@ -990,6 +1049,7 @@ class VortexDLApp(ctk.CTk):
             translate=_,
             default_quality=quality,
             default_media_format=media_format,
+            animator=self.ui_animator,
             on_add=lambda selected_quality, selected_format: self._queue_preview_download(
                 metadata, selected_quality, selected_format
             ),
@@ -1136,6 +1196,7 @@ class VortexDLApp(ctk.CTk):
         if self._closing:
             return
         self._closing = True
+        self.ui_animator.stop()
         self.tray_manager.stop()
         self.clipboard_service.stop()
         self._close_clipboard_toast()
