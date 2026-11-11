@@ -198,7 +198,7 @@ class VortexDLApp(ctk.CTk):
         self.nav_hist_btn.pack(side="left", padx=4)
 
         self.nav_set_btn = ctk.CTkButton(
-            nav_box, text=f"⚙️  {_('Settings')}", width=110, height=36, corner_radius=18,
+            nav_box, text=f"⚙️  {_('Settings')}", width=110, height=36, corner_radius=RADIUS["pill"],
             fg_color="transparent", text_color=COLORS["text_muted"], font=ctk.CTkFont(size=12, weight="bold"),
             command=lambda: self._switch_tab("settings")
         )
@@ -207,7 +207,7 @@ class VortexDLApp(ctk.CTk):
         # Update Alert Notification Button (hidden by default)
         self.update_btn = ctk.CTkButton(
             self.header, text=f"🚀 {_('Update Available')}", height=32, corner_radius=RADIUS["control"],
-            fg_color=COLORS["accent_purple"], hover_color=COLORS["accent"],
+            fg_color=COLORS["accent_purple"], hover_color=COLORS["accent_hover"],
             font=ctk.CTkFont(size=11, weight="bold"), command=self._on_update_clicked
         )
 
@@ -276,13 +276,13 @@ class VortexDLApp(ctk.CTk):
 
         ctk.CTkButton(
             btn_row, text=f"📋  {_('Paste')}", width=115, height=34, corner_radius=RADIUS["control"],
-            fg_color=COLORS["bg_card"], hover_color=COLORS["accent_purple"],
+            fg_color=COLORS["bg_card"], hover_color=COLORS["bg_hover"],
             font=ctk.CTkFont(size=12, weight="bold"), command=self._paste_url
         ).pack(side="left", padx=(0, 8))
 
         ctk.CTkButton(
-            btn_row, text=f"✖  {_('Clear')}", width=100, height=34, corner_radius=17,
-            fg_color=COLORS["bg_card"], hover_color="#444",
+            btn_row, text=f"✖  {_('Clear')}", width=100, height=34, corner_radius=RADIUS["control"],
+            fg_color=COLORS["bg_card"], hover_color=COLORS["bg_hover"],
             font=ctk.CTkFont(size=12), command=lambda: self.url_entry.delete(0, "end")
         ).pack(side="left")
 
@@ -300,7 +300,7 @@ class VortexDLApp(ctk.CTk):
         self.format_menu = ctk.CTkOptionMenu(
             fmt_frame, values=[_("Video (MP4)"), _("Audio Only (MP3)")],
             variable=self.format_var, corner_radius=12,
-            fg_color=COLORS["bg_card"], button_color=COLORS["bg_card"], button_hover_color=COLORS["accent_purple"],
+            fg_color=COLORS["bg_card"], button_color=COLORS["bg_card"], button_hover_color=COLORS["bg_hover"],
             font=ctk.CTkFont(size=12), command=self._on_format_change
         )
         self.format_menu.pack(fill="x", pady=(4, 0))
@@ -315,7 +315,7 @@ class VortexDLApp(ctk.CTk):
         self.quality_menu = ctk.CTkOptionMenu(
             qual_frame, values=[_("Best Quality"), "1080p", "720p", "480p", "360p"],
             variable=self.quality_var, corner_radius=12,
-            fg_color=COLORS["bg_card"], button_color=COLORS["bg_card"], button_hover_color=COLORS["accent_purple"],
+            fg_color=COLORS["bg_card"], button_color=COLORS["bg_card"], button_hover_color=COLORS["bg_hover"],
             font=ctk.CTkFont(size=12)
         )
         self.quality_menu.pack(fill="x", pady=(4, 0))
@@ -334,7 +334,7 @@ class VortexDLApp(ctk.CTk):
         self.dir_label.pack(side="left", fill="x", expand=True)
         ctk.CTkButton(
             dir_sub, text="📁", width=36, height=32, corner_radius=RADIUS["control"],
-            fg_color=COLORS["bg_card"], hover_color=COLORS["accent_purple"], command=self._choose_dir
+            fg_color=COLORS["bg_card"], hover_color=COLORS["bg_hover"], command=self._choose_dir
         ).pack(side="right")
 
         # 3. Concurrent download queue
@@ -347,7 +347,7 @@ class VortexDLApp(ctk.CTk):
         self.download_btn = ctk.CTkButton(
             queue_inner, text=f"⬇  {_('Download')}", height=42, corner_radius=RADIUS["control"],
             font=ctk.CTkFont(size=14, weight="bold"),
-            fg_color=COLORS["accent_purple"], hover_color=COLORS["accent"],
+            fg_color=COLORS["accent_purple"], hover_color=COLORS["accent_hover"],
             text_color="#ffffff", command=self._start_download
         )
         self.download_btn.pack(fill="x", pady=(0, 8))
@@ -409,7 +409,7 @@ class VortexDLApp(ctk.CTk):
             variable=self.speed_limit_var,
             width=125, height=28, corner_radius=RADIUS["control"],
             fg_color=COLORS["bg_secondary"], button_color=COLORS["bg_secondary"],
-            button_hover_color=COLORS["accent_purple"],
+            button_hover_color=COLORS["bg_hover"],
             font=ctk.CTkFont(size=11),
             command=self._on_speed_limit_change,
         )
@@ -443,15 +443,15 @@ class VortexDLApp(ctk.CTk):
         ).pack(side="left")
 
         ctk.CTkButton(
-            hist_header, text=f"🗑️ {_('Clear History')}", height=32, corner_radius=16,
-            fg_color=COLORS["danger"], hover_color="#b30000", font=ctk.CTkFont(size=11, weight="bold"),
+            hist_header, text=f"🗑️ {_('Clear History')}", height=32, corner_radius=RADIUS["control"],
+            fg_color=COLORS["danger"], hover_color=COLORS["danger"], font=ctk.CTkFont(size=11, weight="bold"),
             command=self._clear_history_action
         ).pack(side="right")
 
         # Scrollable list for downloads
         scroll = ctk.CTkScrollableFrame(
             self.main_container, fg_color=COLORS["bg_secondary"],
-            corner_radius=16, border_width=1, border_color=COLORS["border"]
+            corner_radius=RADIUS["panel"], border_width=1, border_color=COLORS["border"]
         )
         scroll.pack(fill="both", expand=True)
 
@@ -489,13 +489,13 @@ class VortexDLApp(ctk.CTk):
             act_box.pack(side="right", padx=12, pady=10)
 
             ctk.CTkButton(
-                act_box, text="📁", width=36, height=32, corner_radius=10,
-                fg_color=COLORS["bg_secondary"], hover_color=COLORS["accent_purple"],
+                act_box, text="📁", width=36, height=32, corner_radius=RADIUS["control"],
+                fg_color=COLORS["bg_secondary"], hover_color=COLORS["bg_hover"],
                 command=lambda p=fpath: self._open_file_folder(p)
             ).pack(side="left", padx=4)
 
             ctk.CTkButton(
-                act_box, text="❌", width=36, height=32, corner_radius=10,
+                act_box, text="❌", width=36, height=32, corner_radius=RADIUS["control"],
                 fg_color=COLORS["bg_secondary"], hover_color=COLORS["danger"],
                 command=lambda i=eid: self._delete_history_item(i)
             ).pack(side="left", padx=4)
@@ -580,7 +580,7 @@ class VortexDLApp(ctk.CTk):
         ctk.CTkLabel(g_row, text=_("Google Drive API Key"), text_color=COLORS["text_muted"], font=ctk.CTkFont(size=12)).pack(anchor="w")
         self.gdrive_entry = ctk.CTkEntry(
             g_row, placeholder_text="Enter custom API key/token...", show="•",
-            corner_radius=10, fg_color=COLORS["bg_primary"], text_color=COLORS["text_primary"]
+            corner_radius=RADIUS["control"], fg_color=COLORS["bg_primary"], text_color=COLORS["text_primary"]
         )
         self.gdrive_entry.pack(fill="x", pady=(2, 0))
         if self.settings.get("gdrive_api_key"):
@@ -591,7 +591,7 @@ class VortexDLApp(ctk.CTk):
         ctk.CTkLabel(o_row, text=_("OneDrive API Key"), text_color=COLORS["text_muted"], font=ctk.CTkFont(size=12)).pack(anchor="w")
         self.onedrive_entry = ctk.CTkEntry(
             o_row, placeholder_text="Enter custom OneDrive token...", show="•",
-            corner_radius=10, fg_color=COLORS["bg_primary"], text_color=COLORS["text_primary"]
+            corner_radius=RADIUS["control"], fg_color=COLORS["bg_primary"], text_color=COLORS["text_primary"]
         )
         self.onedrive_entry.pack(fill="x", pady=(2, 0))
         if self.settings.get("onedrive_api_key"):
@@ -600,7 +600,7 @@ class VortexDLApp(ctk.CTk):
         # Save Button
         ctk.CTkButton(
             settings_content, text=f"💾  {_('Save Settings')}", height=44, corner_radius=RADIUS["control"],
-            fg_color=COLORS["accent_purple"], hover_color=COLORS["accent"],
+            fg_color=COLORS["accent_purple"], hover_color=COLORS["accent_hover"],
             font=ctk.CTkFont(size=14, weight="bold"), command=self._save_settings_action
         ).pack(fill="x", pady=10)
 
