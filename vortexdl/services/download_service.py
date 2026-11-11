@@ -1,5 +1,6 @@
 """Concurrent yt-dlp queue service; workers communicate only through events."""
 import errno
+import logging
 import queue
 import re
 import shutil
@@ -22,6 +23,7 @@ from vortexdl.core.errors import (
 )
 from vortexdl.core.models import DownloadEvent, DownloadStatus, DownloadTask
 from vortexdl.storage.database import add_history_entry
+from vortexdl.services.notification_service import NotificationService
 
 
 _SPEED_RE = re.compile(r"([0-9]+(?:\.[0-9]+)?)\s*([KMGT]?i?B)/s", re.IGNORECASE)
@@ -97,7 +99,7 @@ class _SharedRateLimiter:
 
 class DownloadQueueService:
     """Tracks tasks and runs up to max_workers downloads concurrently."""
-    def __init__(self, events: Optional[queue.Queue] = None, max_workers: int = 3, retry_delay_seconds: float = 5.0, global_speed_limit: int = 0):
+    def __init__(self, events: Optional[queue.Queue] = None, max_workers: int = 3, retry_delay_seconds: float = 5.0, global_speed_limit: int = 0, notification_service: Optional[NotificationService] = None):
         self.events = events if events is not None else queue.Queue()
         self.max_workers = max(1, int(max_workers))
         self.retry_delay_seconds = max(0.0, float(retry_delay_seconds))
@@ -108,6 +110,7 @@ class DownloadQueueService:
         self._retry_timers: dict[str, threading.Timer] = {}
         self._lock = threading.RLock()
         self._closed = False
+        self.notification_service = notification_service or NotificationService()
         self._global_speed_limit = _normalize_speed_limit(global_speed_limit)
         self._active_ydl_params = {}
         self._rate_limiter = _SharedRateLimiter(self._global_speed_limit)
@@ -263,10 +266,36 @@ class DownloadQueueService:
             task = self._tasks.get(task_id)
             if task is None:
                 return
+            previous_status = task.status
             for key, value in changes.items():
                 setattr(task, key, value)
             snapshot = replace(task)
+            should_notify = (
+                snapshot.status != previous_status
+                and snapshot.status in (DownloadStatus.COMPLETED, DownloadStatus.FAILED)
+            )
         self._emit(snapshot, kind, message)
+        if should_notify:
+            self._notify_terminal_status(snapshot)
+
+    def _notify_terminal_status(self, task: DownloadTask) -> None:
+        """Notify the user once when a task reaches a terminal result."""
+        import builtins
+
+        translate = getattr(builtins, "_", lambda text: text)
+        name = task.title or task.url or "VortexDL"
+        if task.status == DownloadStatus.COMPLETED:
+            title = translate("Download Complete")
+            message = translate("Download completed: %(title)s") % {"title": name}
+        elif task.status == DownloadStatus.FAILED:
+            title = translate("Download Failed")
+            message = translate("Download failed: %(title)s") % {"title": name}
+        else:
+            return
+        try:
+            self.notification_service.send_notification(title, message)
+        except Exception:
+            logging.getLogger(__name__).exception("Desktop notification failed")
 
     def _wait_if_paused(self, task_id: str, cancel_event: threading.Event, pause_event: threading.Event) -> None:
         while pause_event.is_set():

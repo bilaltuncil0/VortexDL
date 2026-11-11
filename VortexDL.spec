@@ -33,11 +33,18 @@ hiddenimports = [
 hiddenimports += collect_submodules("vortexdl")
 datas += collect_data_files("vortexdl")
 
-for package in ("yt_dlp", "customtkinter"):
+for package in ("yt_dlp", "customtkinter", "plyer"):
     package_datas, package_binaries, package_hiddenimports = collect_all(package)
     datas += package_datas
     binaries += package_binaries
     hiddenimports += package_hiddenimports
+
+# Plyer loads its macOS bridge dynamically and it is installed via the macOS extra.
+if sys.platform == "darwin":
+    pyobjus_datas, pyobjus_binaries, pyobjus_hiddenimports = collect_all("pyobjus")
+    datas += pyobjus_datas
+    binaries += pyobjus_binaries
+    hiddenimports += pyobjus_hiddenimports
 
 analysis = Analysis(
     [str(ROOT / "app.py")],

@@ -291,3 +291,15 @@ msgstr "不限速"
 
 msgid "Speed limit updated to: "
 msgstr "速度限制已更新为："
+
+msgid "Download Complete"
+msgstr "下载完成"
+
+msgid "Download completed: %(title)s"
+msgstr "下载完成：%(title)s"
+
+msgid "Download Failed"
+msgstr "下载失败"
+
+msgid "Download failed: %(title)s"
+msgstr "下载失败：%(title)s"
