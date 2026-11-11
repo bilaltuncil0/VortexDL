@@ -29,6 +29,8 @@ from vortexdl.ui.tray_manager import TrayManager
 from vortexdl.ui.glass_theme import THEME_CONFIGS, RADIUS
 from vortexdl.services.sound_service import SoundService
 from vortexdl.ui.slide_toast import SlideToast
+from vortexdl.services.optimizer_service import SystemOptimizer
+from vortexdl.services.auto_updater import AutoUpdater as GitAutoUpdater
 
 from storage import load_settings, save_settings
 from vortexdl.storage.database import (
@@ -105,6 +107,7 @@ class VortexDLApp(ctk.CTk):
         self._active_task_id = None
         self._closing = False
         self.sound_service = SoundService(self.settings.get('enable_sound_effects', True))
+        self.optimizer = SystemOptimizer(APP_DIR, download_dirs=(self.settings.get('default_folder', ''),))
         self.tray_manager = TrayManager(ASSETS_DIR, translate=_)
         self._clipboard_toast = None
         self.clipboard_service = ClipboardMonitorService(
@@ -148,10 +151,22 @@ class VortexDLApp(ctk.CTk):
         self.after(100, self._drain_metadata_results)
         self.protocol("WM_DELETE_WINDOW", self._on_close)
 
-        # Run Auto-Updater asynchronously
+        # Run the release notice and guarded source updater asynchronously.
         self.updater = AutoUpdater(callback_on_update=self._notify_new_update)
         if not self.settings.get("disable_telemetry", False):
             self.updater.check_for_updates_async()
+        self.optimizer.cleanup_async()
+        self.auto_updater = GitAutoUpdater(
+            APP_DIR,
+            status_callback=lambda message: self.after(
+                0, self._handle_updater_status, message
+            ),
+            safe_to_update=lambda: (
+                not self._closing and self.download_service.active_count == 0
+            ),
+        )
+        if self.settings.get("auto_update_enabled", True):
+            self.auto_updater.check_and_apply_async()
 
     def _build_ui(self):
         # --- Top Navigation Bar ---
@@ -557,6 +572,24 @@ class VortexDLApp(ctk.CTk):
             progress_color=COLORS["accent"]
         ).pack(side="left")
 
+        # Automatic updates and conservative cleanup
+        updater_frame = ctk.CTkFrame(card, fg_color="transparent")
+        updater_frame.pack(fill="x", padx=20, pady=8)
+        self.auto_update_var = ctk.BooleanVar(
+            value=bool(self.settings.get("auto_update_enabled", True))
+        )
+        ctk.CTkSwitch(
+            updater_frame, text=f"🔄  {_('Auto-Update & Clean')}",
+            variable=self.auto_update_var, font=ctk.CTkFont(size=13),
+            progress_color=COLORS["accent"],
+        ).pack(side="left")
+        self.optimize_now_button = ctk.CTkButton(
+            card, text=_("Optimize and Update Now"), height=34,
+            corner_radius=RADIUS["control"], fg_color=COLORS["bg_card"],
+            hover_color=COLORS["bg_hover"], command=self._optimize_and_update_now,
+        )
+        self.optimize_now_button.pack(fill="x", padx=20, pady=(0, 10))
+
         # Optional UI sound effects
         sound_frame = ctk.CTkFrame(card, fg_color="transparent")
         sound_frame.pack(fill="x", padx=20, pady=8)
@@ -732,6 +765,7 @@ class VortexDLApp(ctk.CTk):
         self.settings["onedrive_api_key"] = self.onedrive_entry.get().strip()
         self.settings["minimize_to_tray"] = self.minimize_to_tray_var.get()
         self.settings["enable_sound_effects"] = self.sound_effects_var.get()
+        self.settings["auto_update_enabled"] = self.auto_update_var.get()
         self.sound_service.set_enabled(self.settings["enable_sound_effects"])
         self.settings.update(self.smart_categories_view.get_values())
         save_settings(self.settings)
@@ -744,6 +778,33 @@ class VortexDLApp(ctk.CTk):
         for widget in self.winfo_children():
             widget.destroy()
         self._build_ui()
+
+    def _handle_updater_status(self, message):
+        if self._closing:
+            return
+        self._log(message)
+        self._show_status_toast("↻", _("Auto-Update & Clean"), message)
+
+    def _optimize_and_update_now(self):
+        button = getattr(self, "optimize_now_button", None)
+        if button is not None and button.winfo_exists():
+            button.configure(state="disabled", text=_("Optimizing…"))
+        self.optimizer.cleanup_async(
+            callback=lambda result: self.after(0, self._finish_optimization, result)
+        )
+
+    def _finish_optimization(self, result):
+        button = getattr(self, "optimize_now_button", None)
+        if button is not None and button.winfo_exists():
+            button.configure(state="normal", text=_("Optimize and Update Now"))
+        self._handle_updater_status(
+            _("Cleanup finished: %(caches)s caches and %(partials)s partial files removed.")
+            % {
+                "caches": result.get("cache_dirs", 0),
+                "partials": result.get("partial_files", 0),
+            }
+        )
+        self.auto_updater.check_and_apply_async(force=True)
 
     def _notify_new_update(self, version_tag, url):
         def show_btn():
