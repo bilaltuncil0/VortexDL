@@ -107,7 +107,12 @@ class VortexDLApp(ctk.CTk):
         self._active_task_id = None
         self._closing = False
         self.sound_service = SoundService(self.settings.get('enable_sound_effects', True))
-        self.optimizer = SystemOptimizer(APP_DIR, download_dirs=(self.settings.get('default_folder', ''),))
+        self.optimizer = SystemOptimizer(
+            APP_DIR,
+            download_dirs=(
+                self.settings.get("default_folder") or str(Path.home() / "Downloads"),
+            ),
+        )
         self.tray_manager = TrayManager(ASSETS_DIR, translate=_)
         self._clipboard_toast = None
         self.clipboard_service = ClipboardMonitorService(
@@ -162,7 +167,13 @@ class VortexDLApp(ctk.CTk):
                 0, self._handle_updater_status, message
             ),
             safe_to_update=lambda: (
-                not self._closing and self.download_service.active_count == 0
+                not self._closing and all(
+                    task.status in (
+                        DownloadStatus.COMPLETED, DownloadStatus.FAILED,
+                        DownloadStatus.CANCELLED,
+                    )
+                    for task in self.download_service.list_tasks()
+                )
             ),
         )
         if self.settings.get("auto_update_enabled", True):
@@ -1030,6 +1041,8 @@ class VortexDLApp(ctk.CTk):
                 if event.kind == "queued":
                     self.sound_service.play_queued()
                     self._show_status_toast("↓", _("Queued"), event.title or event.message)
+                if event.status in (DownloadStatus.COMPLETED, DownloadStatus.CANCELLED):
+                    self.optimizer.optimize_memory()
                 if event.status == DownloadStatus.COMPLETED:
                     self.sound_service.play_completed()
                     self._show_status_toast("✓", _("Download Complete"), event.title or event.message)
