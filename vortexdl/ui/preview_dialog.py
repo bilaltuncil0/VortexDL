@@ -33,6 +33,14 @@ class PreviewDialog(ctk.CTkToplevel):
         self.transient(master)
         self.protocol("WM_DELETE_WINDOW", self.destroy)
 
+        animator = getattr(master, "ui_animator", None)
+        if animator and getattr(animator, "enabled", True):
+            try:
+                animator.apply_window_glass(self, opacity=getattr(master, "window_opacity", 0.93))
+                animator.fade_in(self, duration_ms=180)
+            except Exception:
+                pass
+
         body = ctk.CTkFrame(
             self, fg_color=colors["bg_secondary"], corner_radius=RADIUS["panel"],
             border_width=1, border_color=colors["border"],

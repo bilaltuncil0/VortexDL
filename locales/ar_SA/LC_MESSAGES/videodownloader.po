@@ -325,12 +325,6 @@ msgstr "تفعيل المؤثرات الصوتية"
 msgid "Queued"
 msgstr "أُضيف إلى قائمة الانتظار"
 
-msgid "Download Complete"
-msgstr "اكتمل التنزيل"
-
-msgid "Download Failed"
-msgstr "فشل التنزيل"
-
 msgid "Clipboard link detected"
 msgstr "تم العثور على رابط في الحافظة"
 
@@ -345,3 +339,18 @@ msgstr "تحسين النظام وتحديثه الآن"
 
 msgid "Optimizing…"
 msgstr "جارٍ التحسين…"
+
+msgid "Glass Opacity"
+msgstr "شفافية الزجاج"
+
+msgid "Window Animations"
+msgstr "حركات النوافذ"
+
+msgid "Added to queue: "
+msgstr "تمت الإضافة إلى قائمة الانتظار: "
+
+msgid "Inspecting link: "
+msgstr "فحص الرابط: "
+
+msgid "Cleanup finished: %(caches)s caches and %(partials)s partial files removed."
+msgstr "اكتمل التنظيف: تمت إزالة %(caches)s ذاكرة مؤقتة و %(partials)s ملفات جزئية."

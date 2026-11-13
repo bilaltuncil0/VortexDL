@@ -325,12 +325,6 @@ msgstr "Soundeffekte aktivieren"
 msgid "Queued"
 msgstr "Zur Warteschlange hinzugefügt"
 
-msgid "Download Complete"
-msgstr "Download abgeschlossen"
-
-msgid "Download Failed"
-msgstr "Download fehlgeschlagen"
-
 msgid "Clipboard link detected"
 msgstr "Link in der Zwischenablage gefunden"
 
@@ -345,3 +339,18 @@ msgstr "System jetzt optimieren und aktualisieren"
 
 msgid "Optimizing…"
 msgstr "Optimierung läuft…"
+
+msgid "Glass Opacity"
+msgstr "Glas-Transparenz"
+
+msgid "Window Animations"
+msgstr "Fensteranimationen"
+
+msgid "Added to queue: "
+msgstr "Zur Warteschlange hinzugefügt: "
+
+msgid "Inspecting link: "
+msgstr "Link wird überprüft: "
+
+msgid "Cleanup finished: %(caches)s caches and %(partials)s partial files removed."
+msgstr "Bereinigung abgeschlossen: %(caches)s Caches und %(partials)s Teildateien entfernt."

@@ -325,12 +325,6 @@ msgstr "Ses Efektlerini Etkinleştir"
 msgid "Queued"
 msgstr "Kuyruğa Eklendi"
 
-msgid "Download Complete"
-msgstr "İndirme Tamamlandı"
-
-msgid "Download Failed"
-msgstr "İndirme Başarısız"
-
 msgid "Clipboard link detected"
 msgstr "Panoda Bağlantı Bulundu"
 
@@ -345,3 +339,18 @@ msgstr "Sistemi Şimdi Optimize Et ve Güncelle"
 
 msgid "Optimizing…"
 msgstr "Optimize ediliyor…"
+
+msgid "Glass Opacity"
+msgstr "Cam Saydamlığı"
+
+msgid "Window Animations"
+msgstr "Pencere Animasyonları"
+
+msgid "Added to queue: "
+msgstr "Kuyruğa eklendi: "
+
+msgid "Inspecting link: "
+msgstr "Bağlantı taranıyor: "
+
+msgid "Cleanup finished: %(caches)s caches and %(partials)s partial files removed."
+msgstr "Temizlik tamamlandı: %(caches)s önbellek ve %(partials)s parçalı dosya silindi."

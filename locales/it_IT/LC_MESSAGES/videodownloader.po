@@ -325,12 +325,6 @@ msgstr "Attiva effetti sonori"
 msgid "Queued"
 msgstr "Aggiunto alla coda"
 
-msgid "Download Complete"
-msgstr "Download completato"
-
-msgid "Download Failed"
-msgstr "Download non riuscito"
-
 msgid "Clipboard link detected"
 msgstr "Link trovato negli appunti"
 
@@ -345,3 +339,18 @@ msgstr "Ottimizza e aggiorna ora"
 
 msgid "Optimizing…"
 msgstr "Ottimizzazione…"
+
+msgid "Glass Opacity"
+msgstr "Trasparenza vetro"
+
+msgid "Window Animations"
+msgstr "Animazioni finestre"
+
+msgid "Added to queue: "
+msgstr "Aggiunto alla coda: "
+
+msgid "Inspecting link: "
+msgstr "Controllo collegamento: "
+
+msgid "Cleanup finished: %(caches)s caches and %(partials)s partial files removed."
+msgstr "Pulizia completata: rimossi %(caches)s cache e %(partials)s file parziali."

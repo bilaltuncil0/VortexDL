@@ -11,8 +11,11 @@ import time
 
 RADIUS = {
     "panel": 16,
+    "card": 16,
     "control": 12,
+    "button": 12,
     "pill": 999,
+    "badge": 999,
 }
 
 THEME_CONFIGS = {
@@ -31,7 +34,14 @@ THEME_CONFIGS = {
         "danger": "#FF453A",
         "progress_fg": "#0A84FF",
         "border": "#383842",
+        "border_hover": "#50505E",
         "tab_active": "#2A2A32",
+        # Apple Cupertino Glass specification aliases
+        "deep_glass": "#141417",
+        "card_surface": "#1F1F24",
+        "hover_surface": "#2A2A32",
+        "specular_border": "#383842",
+        "primary": "#0A84FF",
     },
     "light": {
         "bg_primary": "#F2F2F7",
@@ -48,7 +58,14 @@ THEME_CONFIGS = {
         "danger": "#FF453A",
         "progress_fg": "#0A84FF",
         "border": "#D1D1D6",
+        "border_hover": "#B0B0B8",
         "tab_active": "#E5E5EA",
+        # Apple Cupertino Glass specification aliases
+        "deep_glass": "#F2F2F7",
+        "card_surface": "#FFFFFF",
+        "hover_surface": "#E5E5EA",
+        "specular_border": "#D1D1D6",
+        "primary": "#0A84FF",
     },
 }
 

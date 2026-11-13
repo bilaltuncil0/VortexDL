@@ -325,12 +325,6 @@ msgstr "Activer les effets sonores"
 msgid "Queued"
 msgstr "Ajouté à la file d’attente"
 
-msgid "Download Complete"
-msgstr "Téléchargement terminé"
-
-msgid "Download Failed"
-msgstr "Échec du téléchargement"
-
 msgid "Clipboard link detected"
 msgstr "Lien détecté dans le presse-papiers"
 
@@ -345,3 +339,18 @@ msgstr "Optimiser et mettre à jour maintenant"
 
 msgid "Optimizing…"
 msgstr "Optimisation…"
+
+msgid "Glass Opacity"
+msgstr "Transparence du verre"
+
+msgid "Window Animations"
+msgstr "Animations des fenêtres"
+
+msgid "Added to queue: "
+msgstr "Ajouté à la file d'attente : "
+
+msgid "Inspecting link: "
+msgstr "Inspection du lien : "
+
+msgid "Cleanup finished: %(caches)s caches and %(partials)s partial files removed."
+msgstr "Nettoyage terminé : %(caches)s caches et %(partials)s fichiers partiels supprimés."

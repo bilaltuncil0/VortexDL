@@ -325,12 +325,6 @@ msgstr "Enable Sound Effects"
 msgid "Queued"
 msgstr "Queued"
 
-msgid "Download Complete"
-msgstr "Download Complete"
-
-msgid "Download Failed"
-msgstr "Download Failed"
-
 msgid "Clipboard link detected"
 msgstr "Clipboard link detected"
 
@@ -345,3 +339,18 @@ msgstr "Optimize and Update Now"
 
 msgid "Optimizing…"
 msgstr "Optimizing…"
+
+msgid "Glass Opacity"
+msgstr "Glass Opacity"
+
+msgid "Window Animations"
+msgstr "Window Animations"
+
+msgid "Added to queue: "
+msgstr "Added to queue: "
+
+msgid "Inspecting link: "
+msgstr "Inspecting link: "
+
+msgid "Cleanup finished: %(caches)s caches and %(partials)s partial files removed."
+msgstr "Cleanup finished: %(caches)s caches and %(partials)s partial files removed."

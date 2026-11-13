@@ -23,8 +23,12 @@ class TaskRow(ctk.CTkFrame):
         self.animator = animator or UIAnimator(self)
         self._displayed_progress = 0.0
         self.animator.bind_hover(
-            self, option="fg_color", normal=colors["bg_card"],
-            hover=colors["bg_hover"], duration_ms=150,
+            self,
+            options={
+                "fg_color": (colors["bg_card"], colors["bg_hover"]),
+                "border_color": (colors["border"], colors.get("border_hover", colors["border"])),
+            },
+            duration_ms=150,
         )
 
         top = ctk.CTkFrame(self, fg_color="transparent")

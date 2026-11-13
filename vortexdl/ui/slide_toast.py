@@ -28,7 +28,7 @@ class SlideToast(ctk.CTkToplevel):
 
         shell = ctk.CTkFrame(
             self, fg_color=colors["bg_secondary"], corner_radius=16,
-            border_width=1, border_color="#383842",
+            border_width=1, border_color=colors.get("border", "#383842"),
         )
         shell.pack(fill="both", expand=True)
         heading = ctk.CTkFrame(shell, fg_color="transparent")

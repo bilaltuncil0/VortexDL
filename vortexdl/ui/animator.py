@@ -51,7 +51,7 @@ class UIAnimator:
         )
         return True
 
-    def smooth_progress(self, widget, target, *, start=None, duration_ms=180, key=None):
+    def smooth_progress(self, widget, target, *, start=None, duration_ms=180, key=None, easing="linear"):
         target = max(0.0, min(1.0, float(target)))
         if start is None:
             try:
@@ -60,7 +60,7 @@ class UIAnimator:
                 start = 0.0
         self.animate(
             key or ("progress", id(widget)), float(start), target,
-            lambda value: widget.set(value), duration_ms=duration_ms,
+            lambda value: widget.set(value), duration_ms=duration_ms, easing=easing,
         )
 
     def interpolate_color(self, widget, option, start, end, *, duration_ms=160, key=None):
@@ -72,21 +72,23 @@ class UIAnimator:
             duration_ms=duration_ms,
         )
 
-    def bind_hover(self, widget, *, option, normal, hover, duration_ms=150):
-        widget.bind(
-            "<Enter>",
-            lambda _event: self.interpolate_color(
-                widget, option, normal, hover, duration_ms=duration_ms
-            ),
-            add="+",
-        )
-        widget.bind(
-            "<Leave>",
-            lambda _event: self.interpolate_color(
-                widget, option, hover, normal, duration_ms=duration_ms
-            ),
-            add="+",
-        )
+    def bind_hover(self, widget, *, option=None, normal=None, hover=None, duration_ms=150, options=None):
+        pairs = {}
+        if options:
+            pairs.update(options)
+        if option and normal is not None and hover is not None:
+            pairs[option] = (normal, hover)
+
+        def _on_enter(_event):
+            for opt, (norm, hov) in pairs.items():
+                self.interpolate_color(widget, opt, norm, hov, duration_ms=duration_ms)
+
+        def _on_leave(_event):
+            for opt, (norm, hov) in pairs.items():
+                self.interpolate_color(widget, opt, hov, norm, duration_ms=duration_ms)
+
+        widget.bind("<Enter>", _on_enter, add="+")
+        widget.bind("<Leave>", _on_leave, add="+")
 
     def animate(self, key, start, end, update, *, duration_ms=200, easing="ease_out"):
         """Queue an animation request; safe to call from worker threads."""

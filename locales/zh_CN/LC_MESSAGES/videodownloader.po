@@ -325,12 +325,6 @@ msgstr "启用音效"
 msgid "Queued"
 msgstr "已加入队列"
 
-msgid "Download Complete"
-msgstr "下载完成"
-
-msgid "Download Failed"
-msgstr "下载失败"
-
 msgid "Clipboard link detected"
 msgstr "剪贴板中检测到链接"
 
@@ -345,3 +339,18 @@ msgstr "立即优化并更新系统"
 
 msgid "Optimizing…"
 msgstr "正在优化…"
+
+msgid "Glass Opacity"
+msgstr "毛玻璃不透明度"
+
+msgid "Window Animations"
+msgstr "窗口动画"
+
+msgid "Added to queue: "
+msgstr "已加入队列："
+
+msgid "Inspecting link: "
+msgstr "正在解析链接："
+
+msgid "Cleanup finished: %(caches)s caches and %(partials)s partial files removed."
+msgstr "清理完成：已移除 %(caches)s 个缓存和 %(partials)s 个残留分块文件。"

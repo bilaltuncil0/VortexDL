@@ -30,6 +30,18 @@ class SoundService:
     def play_error(self):
         self._play("error")
 
+    def play_pop(self):
+        """Play Apple-style acoustic Pop tone."""
+        self._play("queued")
+
+    def play_glass_chime(self):
+        """Play Apple-style acoustic Glass Chime chord."""
+        self._play("completed")
+
+    def play_soft_bump(self):
+        """Play Apple-style acoustic Soft Bump tone."""
+        self._play("error")
+
     def _play(self, effect):
         if not self.enabled:
             return
