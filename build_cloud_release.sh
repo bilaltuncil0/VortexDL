@@ -3,8 +3,8 @@
 # VortexDL — Bulut Dağıtım Paketi Oluşturucu (Cloud Release Bundler)
 # ==============================================================================
 # Uygulamayı tek parça bağımsız ikili dosya (standalone executable) haline getirip
-# .zip arşivine paketler ve Google Drive, iCloud, OneDrive veya yerel paylaşımlara
-# elle yüklenmeye hazır şekilde Masaüstüne bırakır.
+# .zip arşivine paketler ve Google Drive veya yerel paylaşımlara
+# elle yüklenmeye hazır şekilde Masaüstündeki 'VortexDL_Sürümler' klasörüne bırakır.
 # ==============================================================================
 
 set -euo pipefail
@@ -121,32 +121,25 @@ rm -f "$SCRIPT_DIR/$ZIP_NAME"
 zip -r -q "$SCRIPT_DIR/$ZIP_NAME" "$PACKAGE_DIR"
 log_success "Zip arşivi oluşturuldu: ${ZIP_NAME} ($(du -sh "$SCRIPT_DIR/$ZIP_NAME" | cut -f1))"
 
-# 5. Arşivi Hedef Konuma (OneDrive veya Masaüstü) Taşıma
-log_step "Arşiv hedef konuma aktarılıyor..."
-ONEDRIVE_BASE="$HOME/OneDrive"
+# 5. Arşivi Masaüstündeki 'VortexDL_Sürümler' Klasörüne Taşıma
+log_step "Arşiv Masaüstündeki 'VortexDL_Sürümler' klasörüne aktarılıyor..."
 
-if [ -d "$ONEDRIVE_BASE" ]; then
-    ONEDRIVE_BACKUP_DIR="$ONEDRIVE_BASE/VortexDL_Yedekler"
-    mkdir -p "$ONEDRIVE_BACKUP_DIR"
-    TARGET_ZIP_PATH="$ONEDRIVE_BACKUP_DIR/$ZIP_NAME"
-    mv -f "$SCRIPT_DIR/$ZIP_NAME" "$TARGET_ZIP_PATH"
-    log_success "Zip arşivi OneDrive/VortexDL_Yedekler klasörüne kopyalandı ve bulut eşitlemesi için hazır!"
-    log_info "Konum: ${TARGET_ZIP_PATH}"
+if [ -d "$HOME/Masaüstü" ]; then
+    DESKTOP_DIR="$HOME/Masaüstü"
+elif [ -d "$HOME/Desktop" ]; then
+    DESKTOP_DIR="$HOME/Desktop"
 else
-    # Fallback: Masaüstü Konumu (~/Masaüstü veya ~/Desktop)
-    if [ -d "$HOME/Masaüstü" ]; then
-        FALLBACK_DIR="$HOME/Masaüstü"
-    elif [ -d "$HOME/Desktop" ]; then
-        FALLBACK_DIR="$HOME/Desktop"
-    else
-        FALLBACK_DIR="$HOME/Masaüstü"
-        mkdir -p "$FALLBACK_DIR"
-    fi
-    TARGET_ZIP_PATH="$FALLBACK_DIR/$ZIP_NAME"
-    mv -f "$SCRIPT_DIR/$ZIP_NAME" "$TARGET_ZIP_PATH"
-    log_warn "OneDrive klasörü bulunamadı, Zip arşivi Masaüstüne çıkarıldı."
-    log_info "Konum: ${TARGET_ZIP_PATH}"
+    DESKTOP_DIR="$HOME/Masaüstü"
 fi
+
+RELEASES_DIR="$DESKTOP_DIR/VortexDL_Sürümler"
+mkdir -p "$RELEASES_DIR"
+
+TARGET_ZIP_PATH="$RELEASES_DIR/$ZIP_NAME"
+mv -f "$SCRIPT_DIR/$ZIP_NAME" "$TARGET_ZIP_PATH"
+
+log_success "Zip arşivi Masaüstündeki 'VortexDL_Sürümler' klasörüne çıkarıldı. Google Drive'a yüklemeye hazır!"
+log_info "Konum: ${TARGET_ZIP_PATH}"
 
 # 6. Temizlik
 log_step "Derleme kalıntıları ve geçici dosyalar temizleniyor..."
