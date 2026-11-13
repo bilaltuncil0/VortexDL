@@ -33,16 +33,6 @@ PACKAGE_DIR="VortexDL_v1.0_Portable"
 ZIP_NAME="VortexDL_v1.0_Linux.zip"
 VENV_DIR="$SCRIPT_DIR/.venv"
 
-# Masaüstü Konumunu Belirle (~/Masaüstü veya ~/Desktop)
-if [ -d "$HOME/Masaüstü" ]; then
-    DESKTOP_DIR="$HOME/Masaüstü"
-elif [ -d "$HOME/Desktop" ]; then
-    DESKTOP_DIR="$HOME/Desktop"
-else
-    DESKTOP_DIR="$HOME/Masaüstü"
-    mkdir -p "$DESKTOP_DIR"
-fi
-
 echo -e "${CLR_CYAN}${CLR_BOLD}"
 echo "============================================================"
 echo "      ☁️  VortexDL — Bulut Dağıtım Paketi Oluşturucu         "
@@ -131,13 +121,32 @@ rm -f "$SCRIPT_DIR/$ZIP_NAME"
 zip -r -q "$SCRIPT_DIR/$ZIP_NAME" "$PACKAGE_DIR"
 log_success "Zip arşivi oluşturuldu: ${ZIP_NAME} ($(du -sh "$SCRIPT_DIR/$ZIP_NAME" | cut -f1))"
 
-# 5. Arşivi Masaüstüne Taşıma
-log_step "Arşiv Masaüstüne aktarılıyor..."
-TARGET_ZIP_PATH="$DESKTOP_DIR/$ZIP_NAME"
-mv -f "$SCRIPT_DIR/$ZIP_NAME" "$TARGET_ZIP_PATH"
+# 5. Arşivi Hedef Konuma (OneDrive veya Masaüstü) Taşıma
+log_step "Arşiv hedef konuma aktarılıyor..."
+ONEDRIVE_BASE="$HOME/OneDrive"
 
-log_success "Zip arşivi Masaüstüne çıkarıldı, buluta yüklemeye hazır!"
-log_info "Konum: ${TARGET_ZIP_PATH}"
+if [ -d "$ONEDRIVE_BASE" ]; then
+    ONEDRIVE_BACKUP_DIR="$ONEDRIVE_BASE/VortexDL_Yedekler"
+    mkdir -p "$ONEDRIVE_BACKUP_DIR"
+    TARGET_ZIP_PATH="$ONEDRIVE_BACKUP_DIR/$ZIP_NAME"
+    mv -f "$SCRIPT_DIR/$ZIP_NAME" "$TARGET_ZIP_PATH"
+    log_success "Zip arşivi OneDrive/VortexDL_Yedekler klasörüne kopyalandı ve bulut eşitlemesi için hazır!"
+    log_info "Konum: ${TARGET_ZIP_PATH}"
+else
+    # Fallback: Masaüstü Konumu (~/Masaüstü veya ~/Desktop)
+    if [ -d "$HOME/Masaüstü" ]; then
+        FALLBACK_DIR="$HOME/Masaüstü"
+    elif [ -d "$HOME/Desktop" ]; then
+        FALLBACK_DIR="$HOME/Desktop"
+    else
+        FALLBACK_DIR="$HOME/Masaüstü"
+        mkdir -p "$FALLBACK_DIR"
+    fi
+    TARGET_ZIP_PATH="$FALLBACK_DIR/$ZIP_NAME"
+    mv -f "$SCRIPT_DIR/$ZIP_NAME" "$TARGET_ZIP_PATH"
+    log_warn "OneDrive klasörü bulunamadı, Zip arşivi Masaüstüne çıkarıldı."
+    log_info "Konum: ${TARGET_ZIP_PATH}"
+fi
 
 # 6. Temizlik
 log_step "Derleme kalıntıları ve geçici dosyalar temizleniyor..."
@@ -149,5 +158,4 @@ echo ""
 echo -e "${CLR_GREEN}${CLR_BOLD}============================================================${CLR_RESET}"
 echo -e "${CLR_GREEN}${CLR_BOLD}🎉 Bulut Dağıtım Paketi Hazır!${CLR_RESET}"
 echo -e "${CLR_CYAN}Arşiv Dosyası:${CLR_RESET} ${TARGET_ZIP_PATH}"
-echo -e "${CLR_YELLOW}iCloud, Google Drive veya OneDrive klasörünüze yükleyebilirsiniz.${CLR_RESET}"
 echo -e "${CLR_GREEN}${CLR_BOLD}============================================================${CLR_RESET}"
